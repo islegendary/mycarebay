@@ -1,4 +1,4 @@
-# MyCareBay - Senior Care Management Platform
+# MyCareBay - Senior Care Management Platform Demo
 
 MyCareBay is a comprehensive senior care management platform that helps families centralize their loved one's information and provides AI-powered insights to make confident care decisions.
 
