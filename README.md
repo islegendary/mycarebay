@@ -90,7 +90,7 @@ MyCareBay is a comprehensive web application designed to help caregivers and fam
 
 - `npm run dev` - Start Vite development server
 - `npm run server` - Start Express backend server
-- `npm run dev:full` - Start both frontend and backend
+- `npm run dev:full` - Start both frontend and backend 
 - `npm run build` - Build for production
 - `npm run test:supabase` - Test Supabase connection
 - `npm run preview` - Preview production build
