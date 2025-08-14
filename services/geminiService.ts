@@ -1,12 +1,18 @@
 import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
-import type { CareAdvice, GroundingSource, ChecklistResponse } from '../types';
+import type { CareAdvice, GroundingSource, ChecklistResponse, Senior } from '../types';
 
 // Ensure the API key is available as an environment variable
-const apiKey = process.env.API_KEY;
-if (!apiKey) {
-    throw new Error("API_KEY environment variable not set.");
+const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+console.log('API Key available:', !!apiKey);
+console.log('API Key length:', apiKey ? apiKey.length : 0);
+let ai: GoogleGenAI | null = null;
+
+if (apiKey) {
+    ai = new GoogleGenAI({ apiKey });
+    console.log('AI client initialized');
+} else {
+    console.log('No API key found, AI features disabled');
 }
-const ai = new GoogleGenAI({ apiKey });
 
 /**
  * Fetches educational content for a specific medical ailment using the Gemini API.
@@ -15,8 +21,12 @@ const ai = new GoogleGenAI({ apiKey });
  * @returns A string containing an easy-to-understand explanation of the ailment.
  */
 export const getAilmentEducation = async (ailmentName: string): Promise<string> => {
-  try {
-    const prompt = `
+    if (!ai) {
+        return "AI features are not available. Please check your configuration.";
+    }
+
+    try {
+        const prompt = `
       Provide a simple and easy-to-understand overview for a non-medical caregiver about the following condition: "${ailmentName}".
       Your response should be helpful, reassuring, and clear. 
       Please structure your response into the following sections using markdown headings:
@@ -33,17 +43,17 @@ export const getAilmentEducation = async (ailmentName: string): Promise<string> 
       **Important Disclaimer:** This information is for educational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of a physician or other qualified health provider with any questions you may have regarding a medical condition.
     `;
 
-    const response: GenerateContentResponse = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-    });
-    
-    return response.text;
+        const response: GenerateContentResponse = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+        });
 
-  } catch (error) {
-    console.error("Error fetching ailment education:", error);
-    return "Sorry, we couldn't retrieve information at this time. Please check your connection or try again later.";
-  }
+        return response.text;
+
+    } catch (error) {
+        console.error("Error fetching ailment education:", error);
+        return "Sorry, we couldn't retrieve information at this time. Please check your connection or try again later.";
+    }
 };
 
 /**
@@ -53,6 +63,17 @@ export const getAilmentEducation = async (ailmentName: string): Promise<string> 
  * @returns An object containing the textual advice and a list of sources.
  */
 export const getCareAdvice = async (question: string): Promise<CareAdvice> => {
+    console.log('getCareAdvice called with question:', question);
+    console.log('AI client available:', !!ai);
+
+    if (!ai) {
+        console.log('AI client not available, returning fallback message');
+        return {
+            text: "AI features are not available. Please check your configuration.",
+            sources: []
+        };
+    }
+
     try {
         const systemInstruction = `You are an expert AI assistant specializing in senior care. Your goal is to provide clear, empathetic, and actionable advice to family caregivers. When a user asks a question, use the provided search results to formulate a comprehensive answer. If they ask for a list or checklist, format it clearly with markdown. Always cite your sources.`;
 
@@ -81,13 +102,53 @@ export const getCareAdvice = async (question: string): Promise<CareAdvice> => {
  * @param topic The ailment or topic to focus the checklist on (e.g., "Alzheimer's Disease").
  * @returns A structured checklist object.
  */
-export const generateFacilityChecklist = async (topic: string): Promise<ChecklistResponse> => {
+export const generateFacilityChecklist = async (topic: string, selectedSenior?: Senior | null): Promise<ChecklistResponse> => {
+    console.log('generateFacilityChecklist called with topic:', topic);
+    console.log('selectedSenior:', selectedSenior);
+    console.log('AI client available:', !!ai);
+
+    if (!ai) {
+        console.log('AI client not available, returning fallback checklist');
+        return {
+            checklist: [{
+                category: "AI Not Available",
+                questions: ["AI features are not available. Please check your configuration."]
+            }]
+        };
+    }
+
     try {
-        const systemInstruction = `You are an expert in senior care and geriatrics. A caregiver is preparing to visit a long-term care facility for a loved one with a specific condition. Based on the topic "${topic}", generate a detailed checklist of specific questions they should ask the facility's staff. 
+        // Determine if this is ailment-specific or general
+        const hasAilments = selectedSenior?.ailments && selectedSenior.ailments.length > 0;
+        const ailmentNames = hasAilments ? selectedSenior.ailments.map(a => a.name).join(', ') : '';
+        const seniorName = selectedSenior?.name || 'your loved one';
 
-The questions must be categorized into logical sections. Crucially, you must include a category named 'Equipment & Accommodations' that contains questions about necessary medical equipment, specialized support systems (like wander guards for dementia), and environmental accommodations (like handrails or accessible bathrooms) specifically relevant to "${topic}". Other categories could include 'Staff Training & Experience', 'Daily Care & Routines', and 'Emergency Protocols'.
+        let systemInstruction = '';
 
-Focus only on questions a caregiver should ask a facility related to the ailment.`;
+        if (hasAilments) {
+            systemInstruction = `You are an expert in senior care and geriatrics. A caregiver is preparing to visit a long-term care facility for ${seniorName} who has ${ailmentNames}. Generate a detailed checklist of specific questions they should ask the facility's staff.
+
+The questions must be categorized into logical sections. Focus on:
+1. 'Equipment & Accommodations' - Questions about necessary medical equipment, specialized support systems, and environmental accommodations specifically for ${ailmentNames}
+2. 'Staff Training & Experience' - Questions about staff expertise with ${ailmentNames}
+3. 'Daily Care & Routines' - Questions about how the facility handles daily care for someone with ${ailmentNames}
+4. 'Emergency Protocols' - Questions about emergency procedures specific to ${ailmentNames}
+5. 'Facility Assessment' - Questions to help determine if this facility is the right choice for someone with ${ailmentNames}
+
+Make the questions specific to ${ailmentNames} and focused on determining if the facility can properly care for someone with these conditions.`;
+        } else {
+            systemInstruction = `You are an expert in senior care and geriatrics. A caregiver is preparing to visit a long-term care facility for general assessment. Generate a detailed checklist of specific questions they should ask the facility's staff.
+
+The questions must be categorized into logical sections. Focus on:
+1. 'General Facility Assessment' - Questions about overall facility quality, cleanliness, and atmosphere
+2. 'Staff & Care' - Questions about staff ratios, training, and general care practices
+3. 'Safety & Security' - Questions about safety protocols, emergency procedures, and security measures
+4. 'Activities & Social Life' - Questions about activities, social opportunities, and quality of life
+5. 'Medical Care' - Questions about medical staff, medication management, and healthcare coordination
+6. 'Costs & Policies' - Questions about pricing, policies, and what's included
+
+Make these general questions that would help assess any long-term care facility.`;
+        }
 
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
@@ -127,8 +188,7 @@ Focus only on questions a caregiver should ask a facility related to the ailment
         const jsonText = response.text;
         return JSON.parse(jsonText) as ChecklistResponse;
 
-    } catch (error)
- {
+    } catch (error) {
         console.error("Error generating facility checklist:", error);
         throw new Error("Sorry, we couldn't generate a checklist at this time. Please try again.");
     }

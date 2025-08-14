@@ -1,10 +1,14 @@
 import express from 'express';
-import sqlite3 from 'sqlite3';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config({ path: './env.local' });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,284 +21,231 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../dist')));
 
-// Database setup
-const db = new sqlite3.Database('./database.sqlite', (err) => {
-  if (err) {
-    console.error('Error opening database:', err.message);
-  } else {
-    console.log('Connected to SQLite database');
-    initializeDatabase();
-  }
-});
+// Supabase setup
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-// Initialize database tables
-function initializeDatabase() {
-  db.serialize(() => {
-    // Users table
-    db.run(`CREATE TABLE IF NOT EXISTS users (
-      id TEXT PRIMARY KEY,
-      email TEXT UNIQUE NOT NULL,
-      name TEXT NOT NULL,
-      plan TEXT DEFAULT 'free',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`);
-
-    // Seniors table
-    db.run(`CREATE TABLE IF NOT EXISTS seniors (
-      id TEXT PRIMARY KEY,
-      user_id TEXT NOT NULL,
-      name TEXT NOT NULL,
-      relationship TEXT NOT NULL,
-      avatar_url TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users (id)
-    )`);
-
-    // Ailments table
-    db.run(`CREATE TABLE IF NOT EXISTS ailments (
-      id TEXT PRIMARY KEY,
-      senior_id TEXT NOT NULL,
-      name TEXT NOT NULL,
-      notes TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (senior_id) REFERENCES seniors (id) ON DELETE CASCADE
-    )`);
-
-    // Medications table
-    db.run(`CREATE TABLE IF NOT EXISTS medications (
-      id TEXT PRIMARY KEY,
-      senior_id TEXT NOT NULL,
-      name TEXT NOT NULL,
-      dosage TEXT NOT NULL,
-      frequency TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (senior_id) REFERENCES seniors (id) ON DELETE CASCADE
-    )`);
-
-    // Appointments table
-    db.run(`CREATE TABLE IF NOT EXISTS appointments (
-      id TEXT PRIMARY KEY,
-      senior_id TEXT NOT NULL,
-      date TEXT NOT NULL,
-      time TEXT,
-      doctor TEXT NOT NULL,
-      purpose TEXT,
-      location TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (senior_id) REFERENCES seniors (id) ON DELETE CASCADE
-    )`);
-
-    // Contacts table
-    db.run(`CREATE TABLE IF NOT EXISTS contacts (
-      id TEXT PRIMARY KEY,
-      senior_id TEXT NOT NULL,
-      name TEXT NOT NULL,
-      type TEXT NOT NULL,
-      phone TEXT NOT NULL,
-      email TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (senior_id) REFERENCES seniors (id) ON DELETE CASCADE
-    )`);
-  });
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Missing Supabase environment variables');
+  process.exit(1);
 }
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+console.log('Connected to Supabase');
 
 // API Routes
 
-// Get all seniors for a user
-app.get('/api/seniors/:userId', (req, res) => {
+// Get seniors for a user
+app.get('/api/seniors/:userId', async (req, res) => {
   const { userId } = req.params;
-  
-  // First, get all seniors for the user
-  db.all('SELECT * FROM seniors WHERE user_id = ?', [userId], (err, seniors) => {
-    if (err) {
-      console.error('Error fetching seniors:', err);
+
+  try {
+    // Get seniors
+    const { data: seniors, error: seniorsError } = await supabase
+      .from('seniors')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (seniorsError) {
+      console.error('Error fetching seniors:', seniorsError);
       return res.status(500).json({ error: 'Failed to fetch seniors' });
     }
 
-    if (seniors.length === 0) {
+    if (!seniors || seniors.length === 0) {
       return res.json([]);
     }
 
-    // Get all related data for all seniors
     const seniorIds = seniors.map(s => s.id);
-    const placeholders = seniorIds.map(() => '?').join(',');
-    
-    // Get ailments
-    db.all(`SELECT * FROM ailments WHERE senior_id IN (${placeholders})`, seniorIds, (err, ailments) => {
-      if (err) {
-        console.error('Error fetching ailments:', err);
-        return res.status(500).json({ error: 'Failed to fetch ailments' });
+
+    // Get related data
+    const [ailmentsResult, medicationsResult, appointmentsResult, contactsResult] = await Promise.all([
+      supabase.from('ailments').select('*').in('senior_id', seniorIds),
+      supabase.from('medications').select('*').in('senior_id', seniorIds),
+      supabase.from('appointments').select('*').in('senior_id', seniorIds),
+      supabase.from('contacts').select('*').in('senior_id', seniorIds)
+    ]);
+
+    const ailments = ailmentsResult.data || [];
+    const medications = medicationsResult.data || [];
+    const appointments = appointmentsResult.data || [];
+    const contacts = contactsResult.data || [];
+
+    // Group related data by senior
+    const ailmentsBySenior = {};
+    const medicationsBySenior = {};
+    const appointmentsBySenior = {};
+    const contactsBySenior = {};
+
+    ailments.forEach(ailment => {
+      if (!ailmentsBySenior[ailment.senior_id]) {
+        ailmentsBySenior[ailment.senior_id] = [];
       }
-
-      // Get medications
-      db.all(`SELECT * FROM medications WHERE senior_id IN (${placeholders})`, seniorIds, (err, medications) => {
-        if (err) {
-          console.error('Error fetching medications:', err);
-          return res.status(500).json({ error: 'Failed to fetch medications' });
-        }
-
-        // Get appointments
-        db.all(`SELECT * FROM appointments WHERE senior_id IN (${placeholders})`, seniorIds, (err, appointments) => {
-          if (err) {
-            console.error('Error fetching appointments:', err);
-            return res.status(500).json({ error: 'Failed to fetch appointments' });
-          }
-
-          // Get contacts
-          db.all(`SELECT * FROM contacts WHERE senior_id IN (${placeholders})`, seniorIds, (err, contacts) => {
-            if (err) {
-              console.error('Error fetching contacts:', err);
-              return res.status(500).json({ error: 'Failed to fetch contacts' });
-            }
-
-            // Group related data by senior_id
-            const ailmentsBySenior = {};
-            const medicationsBySenior = {};
-            const appointmentsBySenior = {};
-            const contactsBySenior = {};
-
-            ailments.forEach(ailment => {
-              if (!ailmentsBySenior[ailment.senior_id]) {
-                ailmentsBySenior[ailment.senior_id] = [];
-              }
-              ailmentsBySenior[ailment.senior_id].push(ailment);
-            });
-
-            medications.forEach(med => {
-              if (!medicationsBySenior[med.senior_id]) {
-                medicationsBySenior[med.senior_id] = [];
-              }
-              medicationsBySenior[med.senior_id].push(med);
-            });
-
-            appointments.forEach(appt => {
-              if (!appointmentsBySenior[appt.senior_id]) {
-                appointmentsBySenior[appt.senior_id] = [];
-              }
-              appointmentsBySenior[appt.senior_id].push(appt);
-            });
-
-            contacts.forEach(contact => {
-              if (!contactsBySenior[contact.senior_id]) {
-                contactsBySenior[contact.senior_id] = [];
-              }
-              contactsBySenior[contact.senior_id].push(contact);
-            });
-
-            // Combine all data
-            const result = seniors.map(senior => ({
-              ...senior,
-              ailments: ailmentsBySenior[senior.id] || [],
-              medications: medicationsBySenior[senior.id] || [],
-              appointments: appointmentsBySenior[senior.id] || [],
-              contacts: contactsBySenior[senior.id] || []
-            }));
-
-            res.json(result);
-          });
-        });
-      });
+      ailmentsBySenior[ailment.senior_id].push(ailment);
     });
-  });
+
+    medications.forEach(med => {
+      if (!medicationsBySenior[med.senior_id]) {
+        medicationsBySenior[med.senior_id] = [];
+      }
+      medicationsBySenior[med.senior_id].push(med);
+    });
+
+    appointments.forEach(appt => {
+      if (!appointmentsBySenior[appt.senior_id]) {
+        appointmentsBySenior[appt.senior_id] = [];
+      }
+      appointmentsBySenior[appt.senior_id].push(appt);
+    });
+
+    contacts.forEach(contact => {
+      if (!contactsBySenior[contact.senior_id]) {
+        contactsBySenior[contact.senior_id] = [];
+      }
+      contactsBySenior[contact.senior_id].push(contact);
+    });
+
+    // Combine all data
+    const result = seniors.map(senior => ({
+      ...senior,
+      ailments: ailmentsBySenior[senior.id] || [],
+      medications: medicationsBySenior[senior.id] || [],
+      appointments: appointmentsBySenior[senior.id] || [],
+      contacts: contactsBySenior[senior.id] || []
+    }));
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error in getSeniors:', error);
+    res.status(500).json({ error: 'Failed to fetch seniors' });
+  }
 });
 
 // Create or update a senior
-app.post('/api/seniors', (req, res) => {
+app.post('/api/seniors', async (req, res) => {
   const { userId, senior } = req.body;
   
   if (!userId || !senior.name || !senior.relationship) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  const isUpdate = senior.id && senior.id !== 'new';
+  const isUpdate = senior.id && senior.id !== 'new' && senior.id !== '';
   const seniorId = isUpdate ? senior.id : uuidv4();
 
-  db.serialize(() => {
-    db.run('BEGIN TRANSACTION');
+  try {
+    if (isUpdate) {
+      // Update existing senior
+      const { error: updateError } = await supabase
+        .from('seniors')
+        .update({
+          name: senior.name,
+          relationship: senior.relationship,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', seniorId)
+        .eq('user_id', userId);
 
-    try {
-      if (isUpdate) {
-        // Update existing senior
-        db.run(`
-          UPDATE seniors 
-          SET name = ?, relationship = ?, updated_at = CURRENT_TIMESTAMP
-          WHERE id = ? AND user_id = ?
-        `, [senior.name, senior.relationship, seniorId, userId]);
-
-        // Clear existing related data
-        db.run('DELETE FROM ailments WHERE senior_id = ?', [seniorId]);
-        db.run('DELETE FROM medications WHERE senior_id = ?', [seniorId]);
-        db.run('DELETE FROM appointments WHERE senior_id = ?', [seniorId]);
-        db.run('DELETE FROM contacts WHERE senior_id = ?', [seniorId]);
-      } else {
-        // Create new senior
-        db.run(`
-          INSERT INTO seniors (id, user_id, name, relationship, avatar_url)
-          VALUES (?, ?, ?, ?, ?)
-        `, [seniorId, userId, senior.name, senior.relationship, '']);
+      if (updateError) {
+        console.error('Error updating senior:', updateError);
+        return res.status(500).json({ error: 'Failed to update senior' });
       }
 
-      // Insert ailments
-      if (senior.ailments && senior.ailments.length > 0) {
-        const ailmentStmt = db.prepare('INSERT INTO ailments (id, senior_id, name, notes) VALUES (?, ?, ?, ?)');
-        senior.ailments.forEach(ailment => {
-          ailmentStmt.run(uuidv4(), seniorId, ailment.name, ailment.notes || '');
+      // Clear existing related data
+      await Promise.all([
+        supabase.from('ailments').delete().eq('senior_id', seniorId),
+        supabase.from('medications').delete().eq('senior_id', seniorId),
+        supabase.from('appointments').delete().eq('senior_id', seniorId),
+        supabase.from('contacts').delete().eq('senior_id', seniorId)
+      ]);
+    } else {
+      // Create new senior
+      const { error: insertError } = await supabase
+        .from('seniors')
+        .insert({
+          id: seniorId,
+          user_id: userId,
+          name: senior.name,
+          relationship: senior.relationship,
+          avatar_url: ''
         });
-        ailmentStmt.finalize();
+
+      if (insertError) {
+        console.error('Error creating senior:', insertError);
+        return res.status(500).json({ error: 'Failed to create senior' });
       }
-
-      // Insert medications
-      if (senior.medications && senior.medications.length > 0) {
-        const medStmt = db.prepare('INSERT INTO medications (id, senior_id, name, dosage, frequency) VALUES (?, ?, ?, ?, ?)');
-        senior.medications.forEach(med => {
-          medStmt.run(uuidv4(), seniorId, med.name, med.dosage, med.frequency || '');
-        });
-        medStmt.finalize();
-      }
-
-      // Insert appointments
-      if (senior.appointments && senior.appointments.length > 0) {
-        const apptStmt = db.prepare('INSERT INTO appointments (id, senior_id, date, time, doctor, purpose, location) VALUES (?, ?, ?, ?, ?, ?, ?)');
-        senior.appointments.forEach(appt => {
-          apptStmt.run(uuidv4(), seniorId, appt.date, appt.time || '', appt.doctor, appt.purpose || '', appt.location || '');
-        });
-        apptStmt.finalize();
-      }
-
-      // Insert contacts
-      if (senior.contacts && senior.contacts.length > 0) {
-        const contactStmt = db.prepare('INSERT INTO contacts (id, senior_id, name, type, phone, email) VALUES (?, ?, ?, ?, ?, ?)');
-        senior.contacts.forEach(contact => {
-          contactStmt.run(uuidv4(), seniorId, contact.name, contact.type, contact.phone, contact.email || '');
-        });
-        contactStmt.finalize();
-      }
-
-      db.run('COMMIT', (err) => {
-        if (err) {
-          console.error('Error committing transaction:', err);
-          db.run('ROLLBACK');
-          return res.status(500).json({ error: 'Failed to save senior' });
-        }
-        
-        res.json({ 
-          success: true, 
-          seniorId,
-          message: isUpdate ? 'Senior updated successfully' : 'Senior created successfully'
-        });
-      });
-
-    } catch (error) {
-      console.error('Error in transaction:', error);
-      db.run('ROLLBACK');
-      res.status(500).json({ error: 'Failed to save senior' });
     }
-  });
+
+    // Insert related data
+    const insertPromises = [];
+
+    if (senior.ailments && senior.ailments.length > 0) {
+      const ailmentsData = senior.ailments.map(ailment => ({
+        id: uuidv4(),
+        senior_id: seniorId,
+        name: ailment.name,
+        notes: ailment.notes || ''
+      }));
+      insertPromises.push(supabase.from('ailments').insert(ailmentsData));
+    }
+
+    if (senior.medications && senior.medications.length > 0) {
+      const medicationsData = senior.medications.map(med => ({
+        id: uuidv4(),
+        senior_id: seniorId,
+        name: med.name,
+        dosage: med.dosage,
+        frequency: med.frequency || ''
+      }));
+      insertPromises.push(supabase.from('medications').insert(medicationsData));
+    }
+
+    if (senior.appointments && senior.appointments.length > 0) {
+      const appointmentsData = senior.appointments.map(appt => ({
+        id: uuidv4(),
+        senior_id: seniorId,
+        date: appt.date,
+        time: appt.time || '',
+        doctor: appt.doctor,
+        purpose: appt.purpose || '',
+        location: appt.location || ''
+      }));
+      insertPromises.push(supabase.from('appointments').insert(appointmentsData));
+    }
+
+    if (senior.contacts && senior.contacts.length > 0) {
+      const contactsData = senior.contacts.map(contact => ({
+        id: uuidv4(),
+        senior_id: seniorId,
+        name: contact.name,
+        type: contact.type,
+        phone: contact.phone,
+        email: contact.email || ''
+      }));
+      insertPromises.push(supabase.from('contacts').insert(contactsData));
+    }
+
+    if (insertPromises.length > 0) {
+      const results = await Promise.all(insertPromises);
+      const errors = results.filter(result => result.error);
+      if (errors.length > 0) {
+        console.error('Error inserting related data:', errors);
+        return res.status(500).json({ error: 'Failed to save related data' });
+      }
+    }
+    
+    res.json({ 
+      success: true, 
+      seniorId,
+      message: isUpdate ? 'Senior updated successfully' : 'Senior created successfully'
+    });
+
+  } catch (error) {
+    console.error('Error in saveSenior:', error);
+    res.status(500).json({ error: 'Failed to save senior' });
+  }
 });
 
 // Delete a senior
-app.delete('/api/seniors/:seniorId', (req, res) => {
+app.delete('/api/seniors/:seniorId', async (req, res) => {
   const { seniorId } = req.params;
   const { userId } = req.query;
 
@@ -302,54 +253,87 @@ app.delete('/api/seniors/:seniorId', (req, res) => {
     return res.status(400).json({ error: 'User ID required' });
   }
 
-  db.run('DELETE FROM seniors WHERE id = ? AND user_id = ?', [seniorId, userId], function(err) {
-    if (err) {
-      console.error('Error deleting senior:', err);
+  try {
+    // Delete related data first (due to foreign key constraints)
+    await Promise.all([
+      supabase.from('ailments').delete().eq('senior_id', seniorId),
+      supabase.from('medications').delete().eq('senior_id', seniorId),
+      supabase.from('appointments').delete().eq('senior_id', seniorId),
+      supabase.from('contacts').delete().eq('senior_id', seniorId)
+    ]);
+
+    // Delete the senior
+    const { error, count } = await supabase
+      .from('seniors')
+      .delete()
+      .eq('id', seniorId)
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Error deleting senior:', error);
       return res.status(500).json({ error: 'Failed to delete senior' });
     }
 
-    if (this.changes === 0) {
+    if (count === 0) {
       return res.status(404).json({ error: 'Senior not found' });
     }
 
     res.json({ success: true, message: 'Senior deleted successfully' });
-  });
+  } catch (error) {
+    console.error('Error in deleteSenior:', error);
+    res.status(500).json({ error: 'Failed to delete senior' });
+  }
 });
 
 // User authentication routes
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   const { email, name, plan } = req.body;
   
   if (!email || !name) {
     return res.status(400).json({ error: 'Email and name are required' });
   }
 
-  // Check if user exists
-  db.get('SELECT * FROM users WHERE email = ?', [email], (err, user) => {
-    if (err) {
-      console.error('Error checking user:', err);
+  try {
+    // Check if user exists
+    const { data: existingUser, error: selectError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    if (selectError && selectError.code !== 'PGRST116') { // PGRST116 = no rows returned
+      console.error('Error checking user:', selectError);
       return res.status(500).json({ error: 'Authentication failed' });
     }
 
-    if (user) {
+    if (existingUser) {
       // User exists, return existing user
-      res.json(user);
+      res.json(existingUser);
     } else {
       // Create new user
       const userId = uuidv4();
-      db.run('INSERT INTO users (id, email, name, plan) VALUES (?, ?, ?, ?)', 
-        [userId, email, name, plan || 'free'], 
-        function(err) {
-          if (err) {
-            console.error('Error creating user:', err);
-            return res.status(500).json({ error: 'Failed to create user' });
-          }
-          
-          res.json({ id: userId, email, name, plan: plan || 'free' });
-        }
-      );
+      const { data: newUser, error: insertError } = await supabase
+        .from('users')
+        .insert({
+          id: userId,
+          email,
+          name,
+          plan: plan || 'free'
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Error creating user:', insertError);
+        return res.status(500).json({ error: 'Failed to create user' });
+      }
+      
+      res.json(newUser);
     }
-  });
+  } catch (error) {
+    console.error('Error in login:', error);
+    res.status(500).json({ error: 'Authentication failed' });
+  }
 });
 
 // Serve React app for all other routes
@@ -370,12 +354,6 @@ app.listen(PORT, () => {
 
 // Graceful shutdown
 process.on('SIGINT', () => {
-  db.close((err) => {
-    if (err) {
-      console.error('Error closing database:', err.message);
-    } else {
-      console.log('Database connection closed.');
-    }
-    process.exit(0);
-  });
+  console.log('Shutting down server...');
+  process.exit(0);
 });

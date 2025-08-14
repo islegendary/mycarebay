@@ -9,17 +9,21 @@
     "preview": "vite preview",
     "server": "node server/index.js",
     "dev:full": "concurrently \"npm run server\" \"npm run dev\"",
-    "seed": "node server/seedDatabase.js"
+
+    "vercel-build": "vite build",
+    "test:supabase": "node test-supabase.js"
   },
   "dependencies": {
     "@google/genai": "^1.13.0",
+    "@supabase/supabase-js": "^2.55.0",
     "body-parser": "^1.20.2",
     "concurrently": "^8.2.2",
     "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
     "express": "^4.18.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "sqlite3": "^5.1.6",
+
     "uuid": "^9.0.1"
   },
   "devDependencies": {

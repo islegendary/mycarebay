@@ -23,13 +23,13 @@ const Checklist: React.FC<ChecklistProps> = ({ data, topic }) => {
                 Facility Checklist for: <span className="text-brand-blue-dark">{topic}</span>
             </h2>
             <p className="text-brand-gray-medium">Use these questions to guide your conversation with potential care facilities.</p>
-            
+
             <div className="space-y-6">
-                {data.checklist.map((category, catIndex) => (
+                {data?.checklist?.map((category, catIndex) => (
                     <div key={`${componentId}-cat-${catIndex}`} className="p-4 border border-slate-200 rounded-lg bg-slate-50">
                         <h3 className="text-lg font-bold text-brand-gray-dark mb-3">{category.category}</h3>
                         <ul className="space-y-3">
-                            {category.questions.map((question, qIndex) => {
+                            {category?.questions?.map((question, qIndex) => {
                                 const questionId = `${componentId}-q-${catIndex}-${qIndex}`;
                                 const isChecked = !!checkedItems[question];
                                 return (

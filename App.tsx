@@ -33,7 +33,7 @@ function App() {
     try {
       loadingState.setLoading(true);
       loadingState.setError(null);
-      
+
       const seniorsData = await ApiService.getSeniors(userId);
       setSeniors(seniorsData);
     } catch (error) {
@@ -50,14 +50,14 @@ function App() {
     try {
       loadingState.setLoading(true);
       loadingState.setError(null);
-      
+
       // Authenticate with backend
       const authenticatedUser = await ApiService.login(user.email, user.name, user.plan);
-      
+
       // Store user locally
       localStorage.setItem('currentUser', JSON.stringify(authenticatedUser));
       setCurrentUser(authenticatedUser);
-      
+
       // Load seniors for the user
       await loadSeniors(authenticatedUser.id);
     } catch (error) {
@@ -82,8 +82,13 @@ function App() {
   };
 
   const handleNavigate = (view: ActiveView) => {
-    setSelectedSeniorId(null);
-    setActiveView(view);
+    // Don't clear selectedSeniorId when navigating to advisor
+    if (view === 'advisor') {
+      setActiveView(view);
+    } else {
+      setSelectedSeniorId(null);
+      setActiveView(view);
+    }
   };
 
   const updateSenior = (updatedSenior: Senior) => {
@@ -109,9 +114,9 @@ function App() {
     try {
       loadingState.setLoading(true);
       loadingState.setError(null);
-      
+
       const result = await ApiService.saveSenior(currentUser.id, senior);
-      
+
       if (result.success) {
         if (editingSenior) {
           // Update existing senior in state
@@ -121,7 +126,7 @@ function App() {
           const newSenior = { ...senior, id: result.seniorId };
           setSeniors([...seniors, newSenior]);
         }
-        
+
         setIsAddSeniorModalOpen(false);
         setEditingSenior(null);
       }
@@ -146,9 +151,9 @@ function App() {
     try {
       loadingState.setLoading(true);
       loadingState.setError(null);
-      
+
       const result = await ApiService.deleteSenior(seniorId, currentUser.id);
-      
+
       if (result.success) {
         setSeniors(seniors.filter(s => s.id !== seniorId));
         if (selectedSeniorId === seniorId) {
@@ -187,8 +192,8 @@ function App() {
           </div>
           <h2 className="text-xl font-bold text-brand-gray-dark mb-2">Connection Error</h2>
           <p className="text-brand-gray-medium mb-4">{loadingState.error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="btn btn-primary"
           >
             Retry
@@ -206,13 +211,13 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header 
-        user={currentUser} 
+      <Header
+        user={currentUser}
         onLogout={handleLogout}
         onNavigate={handleNavigate}
         activeView={activeView}
       />
-      
+
       {loadingState.loading && (
         <div className="fixed top-4 right-4 bg-white rounded-lg shadow-lg p-4 z-50">
           <div className="flex items-center space-x-2">
@@ -232,7 +237,7 @@ function App() {
               <p className="text-red-800 text-sm font-medium">Error</p>
               <p className="text-red-700 text-sm">{loadingState.error}</p>
             </div>
-            <button 
+            <button
               onClick={() => loadingState.setError(null)}
               className="text-red-400 hover:text-red-600"
             >
@@ -247,25 +252,31 @@ function App() {
       <main className="container mx-auto px-4 py-8">
         {activeView === 'dashboard' && (
           selectedSenior ? (
-            <SeniorProfile 
-              senior={selectedSenior} 
+            <SeniorProfile
+              senior={selectedSenior}
               onBack={() => setSelectedSeniorId(null)}
               onEdit={() => handleEditSenior(selectedSenior)}
               onDelete={() => handleDeleteSenior(selectedSenior.id)}
+              onNavigateToAdvisor={() => handleNavigate('advisor')}
             />
           ) : (
-            <Dashboard 
-              seniors={seniors} 
+            <Dashboard
+              seniors={seniors}
               onSelectSenior={handleSelectSenior}
               onAddSenior={handleAddSenior}
               onNavigateToAdvisor={() => handleNavigate('advisor')}
             />
           )
         )}
-        
+
         {activeView === 'advisor' && (
-          <CareAdvisor />
+          <CareAdvisor
+            selectedSenior={selectedSenior}
+            onBackToProfile={() => handleNavigate('dashboard')}
+          />
         )}
+
+
       </main>
 
       <AddSeniorModal

@@ -9,8 +9,8 @@ interface AuthModalProps {
 }
 
 const AuthModal: React.FC<AuthModalProps> = ({ mode: initialMode, plan, onClose, onAuthenticate }) => {
-    const [email, setEmail] = useState('dependent@example.com');
-    const [password, setPassword] = useState('password');
+    const [email, setEmail] = useState('demo@mycarebay.com');
+    const [password, setPassword] = useState('Demo2024!');
     const [currentMode, setCurrentMode] = useState(initialMode);
 
     useEffect(() => {
@@ -45,7 +45,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ mode: initialMode, plan, onClose,
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4" onClick={onClose}>
-            <div 
+            <div
                 className="bg-white rounded-lg shadow-2xl max-w-md w-full"
                 onClick={e => e.stopPropagation()}
             >
@@ -58,12 +58,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ mode: initialMode, plan, onClose,
                     </button>
                 </div>
                 <div className="p-8">
-                     <p className="text-center text-brand-gray-medium mb-6">
-                        {isSigningUp 
+                    <p className="text-center text-brand-gray-medium mb-6">
+                        {isSigningUp
                             ? `Create an account to start your ${planTitle} plan.`
                             : 'Welcome back! Please enter your details.'
                         }
-                     </p>
+                    </p>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
                             <label htmlFor="email-auth" className="block text-sm font-medium text-brand-gray-dark">

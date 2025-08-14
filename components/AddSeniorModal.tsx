@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Senior, Ailment, Medication, Appointment, Contact } from '../types';
 
 interface AddSeniorModalProps {
@@ -10,13 +10,37 @@ interface AddSeniorModalProps {
 
 const AddSeniorModal: React.FC<AddSeniorModalProps> = ({ isOpen, onClose, onSave, editingSenior }) => {
   const [formData, setFormData] = useState<Partial<Senior>>({
-    name: editingSenior?.name || '',
-    relationship: editingSenior?.relationship || '',
-    ailments: editingSenior?.ailments || [],
-    medications: editingSenior?.medications || [],
-    appointments: editingSenior?.appointments || [],
-    contacts: editingSenior?.contacts || []
+    name: '',
+    relationship: '',
+    ailments: [],
+    medications: [],
+    appointments: [],
+    contacts: []
   });
+
+  // Update form data when editingSenior changes
+  useEffect(() => {
+    if (editingSenior) {
+      setFormData({
+        name: editingSenior.name || '',
+        relationship: editingSenior.relationship || '',
+        ailments: editingSenior.ailments || [],
+        medications: editingSenior.medications || [],
+        appointments: editingSenior.appointments || [],
+        contacts: editingSenior.contacts || []
+      });
+    } else {
+      // Reset form when creating new senior
+      setFormData({
+        name: '',
+        relationship: '',
+        ailments: [],
+        medications: [],
+        appointments: [],
+        contacts: []
+      });
+    }
+  }, [editingSenior]);
 
   const [newAilment, setNewAilment] = useState({ name: '', notes: '' });
   const [newMedication, setNewMedication] = useState({ name: '', dosage: '', frequency: '' });
@@ -33,7 +57,7 @@ const AddSeniorModal: React.FC<AddSeniorModalProps> = ({ isOpen, onClose, onSave
     }
 
     const seniorData: Senior = {
-      id: editingSenior?.id || `senior-${Date.now()}`,
+      id: editingSenior?.id || '', // Let backend generate UUID for new seniors
       name: formData.name,
       relationship: formData.relationship,
       avatarUrl: '', // No longer needed since we use initials

@@ -9,9 +9,10 @@ interface SeniorProfileProps {
   onBack: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onNavigateToAdvisor: () => void;
 }
 
-const SeniorProfile: React.FC<SeniorProfileProps> = ({ senior, onBack, onEdit, onDelete }) => {
+const SeniorProfile: React.FC<SeniorProfileProps> = ({ senior, onBack, onEdit, onDelete, onNavigateToAdvisor }) => {
   const [selectedAilment, setSelectedAilment] = useState<Ailment | null>(null);
 
   return (
@@ -32,6 +33,15 @@ const SeniorProfile: React.FC<SeniorProfileProps> = ({ senior, onBack, onEdit, o
           </div>
         </div>
         <div className="mt-4 md:mt-0 flex space-x-3">
+          <button
+            onClick={onNavigateToAdvisor}
+            className="btn btn-secondary"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+            </svg>
+            Care Advisor
+          </button>
           <button
             onClick={onEdit}
             className="btn btn-primary"
@@ -81,7 +91,7 @@ const SeniorProfile: React.FC<SeniorProfileProps> = ({ senior, onBack, onEdit, o
         <div className="space-y-8">
           {/* Appointments Section */}
           <InfoCard title="Upcoming Appointments">
-             <ul className="divide-y divide-slate-200">
+            <ul className="divide-y divide-slate-200">
               {(senior.appointments || []).map(appt => (
                 <li key={appt.id} className="py-3">
                   <p className="font-medium text-brand-gray-dark">{new Date(appt.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} at {appt.time}</p>
@@ -94,7 +104,7 @@ const SeniorProfile: React.FC<SeniorProfileProps> = ({ senior, onBack, onEdit, o
 
           {/* Contacts Section */}
           <InfoCard title="Important Contacts">
-             <ul className="divide-y divide-slate-200">
+            <ul className="divide-y divide-slate-200">
               {(senior.contacts || []).map(contact => (
                 <li key={contact.id} className="py-3">
                   <p className="font-medium text-brand-gray-dark">{contact.name} <span className="text-xs font-semibold bg-brand-blue-light text-brand-blue-dark px-2 py-0.5 rounded-full ml-2">{contact.type}</span></p>
@@ -106,10 +116,10 @@ const SeniorProfile: React.FC<SeniorProfileProps> = ({ senior, onBack, onEdit, o
           </InfoCard>
         </div>
       </div>
-      
+
       {selectedAilment && (
-        <AilmentInfoModal 
-          ailmentName={selectedAilment.name} 
+        <AilmentInfoModal
+          ailmentName={selectedAilment.name}
           onClose={() => setSelectedAilment(null)}
         />
       )}
