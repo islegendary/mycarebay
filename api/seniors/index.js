@@ -20,10 +20,19 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('=== SAVE SENIOR REQUEST ===');
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+    
     const { userId, senior } = req.body;
 
     if (!userId || !senior) {
+      console.error('Missing required data:', { userId: !!userId, senior: !!senior });
       return res.status(400).json({ error: 'User ID and senior data are required' });
+    }
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Missing Supabase credentials');
+      return res.status(500).json({ error: 'Server configuration error' });
     }
 
     const isUpdate = !!senior.id;
@@ -129,6 +138,7 @@ export default async function handler(req, res) {
       }
     }
 
+    console.log('=== SAVE SUCCESSFUL ===');
     res.status(200).json({
       success: true,
       seniorId: seniorId,
@@ -136,7 +146,12 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('Save senior error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('=== SAVE SENIOR ERROR ===');
+    console.error('Error details:', error);
+    console.error('Stack trace:', error.stack);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
   }
 }
