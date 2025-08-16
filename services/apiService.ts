@@ -67,7 +67,7 @@ export class ApiService {
 
   // Senior management
   static async getSeniors(userId: string): Promise<Senior[]> {
-    return this.makeRequest<Senior[]>(`/seniors/${userId}`);
+    return this.makeRequest<Senior[]>(`/seniors/user?userId=${userId}`);
   }
 
   static async saveSenior(userId: string, senior: Senior): Promise<SaveSeniorResponse> {
@@ -78,7 +78,7 @@ export class ApiService {
   }
 
   static async deleteSenior(seniorId: string, userId: string): Promise<DeleteSeniorResponse> {
-    return this.makeRequest<DeleteSeniorResponse>(`/seniors/${seniorId}?userId=${userId}`, {
+    return this.makeRequest<DeleteSeniorResponse>(`/seniors/delete?seniorId=${seniorId}&userId=${userId}`, {
       method: 'DELETE',
     });
   }

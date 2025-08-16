@@ -10,8 +10,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { seniorId } = req.query;
-    const { userId } = req.query;
+    const { seniorId, userId } = req.query;
 
     if (!seniorId || !userId) {
       return res.status(400).json({ error: 'Senior ID and User ID are required' });
