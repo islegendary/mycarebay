@@ -62,10 +62,17 @@ export default async function handler(req, res) {
     console.log('Senior saved successfully:', seniorData);
 
     // Handle related data
+    console.log('Processing related data...');
+    
     if (senior.ailments) {
+      console.log('Processing ailments:', senior.ailments.length);
       // Delete existing ailments if updating
       if (isUpdate) {
-        await supabase.from('ailments').delete().eq('senior_id', seniorId);
+        const { error: deleteError } = await supabase.from('ailments').delete().eq('senior_id', seniorId);
+        if (deleteError) {
+          console.error('Failed to delete existing ailments:', deleteError);
+          throw new Error(`Failed to delete existing ailments: ${deleteError.message}`);
+        }
       }
       
       // Insert new ailments
@@ -74,16 +81,27 @@ export default async function handler(req, res) {
           id: ailment.id || uuidv4(),
           senior_id: seniorId,
           name: ailment.name,
-          notes: ailment.notes
+          notes: ailment.notes || ''
         }));
         
-        await supabase.from('ailments').insert(ailmentsData);
+        console.log('Inserting ailments:', ailmentsData);
+        const { error: ailmentsError } = await supabase.from('ailments').insert(ailmentsData);
+        if (ailmentsError) {
+          console.error('Failed to insert ailments:', ailmentsError);
+          throw new Error(`Failed to insert ailments: ${ailmentsError.message}`);
+        }
+        console.log('Ailments inserted successfully');
       }
     }
 
     if (senior.medications) {
+      console.log('Processing medications:', senior.medications.length);
       if (isUpdate) {
-        await supabase.from('medications').delete().eq('senior_id', seniorId);
+        const { error: deleteError } = await supabase.from('medications').delete().eq('senior_id', seniorId);
+        if (deleteError) {
+          console.error('Failed to delete existing medications:', deleteError);
+          throw new Error(`Failed to delete existing medications: ${deleteError.message}`);
+        }
       }
       
       if (senior.medications.length > 0) {
@@ -92,16 +110,27 @@ export default async function handler(req, res) {
           senior_id: seniorId,
           name: med.name,
           dosage: med.dosage,
-          frequency: med.frequency
+          frequency: med.frequency || ''
         }));
         
-        await supabase.from('medications').insert(medicationsData);
+        console.log('Inserting medications:', medicationsData);
+        const { error: medicationsError } = await supabase.from('medications').insert(medicationsData);
+        if (medicationsError) {
+          console.error('Failed to insert medications:', medicationsError);
+          throw new Error(`Failed to insert medications: ${medicationsError.message}`);
+        }
+        console.log('Medications inserted successfully');
       }
     }
 
     if (senior.appointments) {
+      console.log('Processing appointments:', senior.appointments.length);
       if (isUpdate) {
-        await supabase.from('appointments').delete().eq('senior_id', seniorId);
+        const { error: deleteError } = await supabase.from('appointments').delete().eq('senior_id', seniorId);
+        if (deleteError) {
+          console.error('Failed to delete existing appointments:', deleteError);
+          throw new Error(`Failed to delete existing appointments: ${deleteError.message}`);
+        }
       }
       
       if (senior.appointments.length > 0) {
@@ -109,13 +138,19 @@ export default async function handler(req, res) {
           id: appt.id || uuidv4(),
           senior_id: seniorId,
           date: appt.date,
-          time: appt.time,
+          time: appt.time || '',
           doctor: appt.doctor,
-          purpose: appt.purpose,
-          location: appt.location
+          purpose: appt.purpose || '',
+          location: appt.location || ''
         }));
         
-        await supabase.from('appointments').insert(appointmentsData);
+        console.log('Inserting appointments:', appointmentsData);
+        const { error: appointmentsError } = await supabase.from('appointments').insert(appointmentsData);
+        if (appointmentsError) {
+          console.error('Failed to insert appointments:', appointmentsError);
+          throw new Error(`Failed to insert appointments: ${appointmentsError.message}`);
+        }
+        console.log('Appointments inserted successfully');
       }
     }
 
