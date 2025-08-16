@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { v4 as uuidv4 } from 'uuid';
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
@@ -42,7 +43,7 @@ export default async function handler(req, res) {
       user = existingUser;
     } else {
       // Create new user
-      const userId = crypto.randomUUID();
+      const userId = uuidv4();
       const { data: newUser, error: insertError } = await supabase
         .from('users')
         .insert([

@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { v4 as uuidv4 } from 'uuid';
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
@@ -26,7 +27,9 @@ export default async function handler(req, res) {
     }
 
     const isUpdate = !!senior.id;
-    const seniorId = senior.id || crypto.randomUUID();
+    const seniorId = senior.id || uuidv4();
+    
+    console.log('Save senior request:', { userId, seniorName: senior.name, isUpdate, seniorId });
 
     // Start a transaction
     const { data: seniorData, error: seniorError } = await supabase
@@ -43,8 +46,11 @@ export default async function handler(req, res) {
       .single();
 
     if (seniorError) {
+      console.error('Failed to save senior:', seniorError);
       return res.status(500).json({ error: 'Failed to save senior' });
     }
+    
+    console.log('Senior saved successfully:', seniorData);
 
     // Handle related data
     if (senior.ailments) {
@@ -56,7 +62,7 @@ export default async function handler(req, res) {
       // Insert new ailments
       if (senior.ailments.length > 0) {
         const ailmentsData = senior.ailments.map(ailment => ({
-          id: ailment.id || crypto.randomUUID(),
+          id: ailment.id || uuidv4(),
           senior_id: seniorId,
           name: ailment.name,
           notes: ailment.notes
@@ -73,7 +79,7 @@ export default async function handler(req, res) {
       
       if (senior.medications.length > 0) {
         const medicationsData = senior.medications.map(med => ({
-          id: med.id || crypto.randomUUID(),
+          id: med.id || uuidv4(),
           senior_id: seniorId,
           name: med.name,
           dosage: med.dosage,
@@ -91,7 +97,7 @@ export default async function handler(req, res) {
       
       if (senior.appointments.length > 0) {
         const appointmentsData = senior.appointments.map(appt => ({
-          id: appt.id || crypto.randomUUID(),
+          id: appt.id || uuidv4(),
           senior_id: seniorId,
           date: appt.date,
           time: appt.time,
@@ -111,7 +117,7 @@ export default async function handler(req, res) {
       
       if (senior.contacts.length > 0) {
         const contactsData = senior.contacts.map(contact => ({
-          id: contact.id || crypto.randomUUID(),
+          id: contact.id || uuidv4(),
           senior_id: seniorId,
           name: contact.name,
           type: contact.type,
