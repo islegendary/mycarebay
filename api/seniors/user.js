@@ -46,18 +46,30 @@ export default async function handler(req, res) {
       .select('*')
       .eq('user_id', userId);
 
+    console.log('Seniors query result:', { seniors, error: seniorsError });
+
     if (seniorsError) {
+      console.error('Seniors fetch error:', seniorsError);
       return res.status(500).json({ error: 'Failed to fetch seniors' });
+    }
+
+    if (!seniors || seniors.length === 0) {
+      console.log('No seniors found for user:', userId);
+      return res.status(200).json([]);
     }
 
     // For each senior, get their related data
     const seniorsWithData = await Promise.all(
       seniors.map(async (senior) => {
+        console.log('Fetching data for senior:', senior.id, senior.name);
+        
         // Get ailments
-        const { data: ailments } = await supabase
+        const { data: ailments, error: ailmentsError } = await supabase
           .from('ailments')
           .select('*')
           .eq('senior_id', senior.id);
+          
+        console.log('Ailments for', senior.name, ':', { ailments, error: ailmentsError });
 
         // Get medications
         const { data: medications } = await supabase

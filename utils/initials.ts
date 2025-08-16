@@ -31,17 +31,17 @@ export function getInitials(name: string): string {
 export function getNameColor(name: string): string {
   const colors = [
     'bg-blue-600',      // Better contrast than 500
-    'bg-green-600',     // Better contrast than 500
-    'bg-purple-600',    // Better contrast than 500
-    'bg-pink-600',      // Better contrast than 500
-    'bg-indigo-600',    // Better contrast than 500
+    'bg-emerald-600',   // Better contrast than 500
+    'bg-violet-600',    // Better contrast than 500
     'bg-red-600',       // Better contrast than 500
-    'bg-amber-600',     // Better than yellow-500 for contrast
-    'bg-teal-600',      // Better contrast than 500
     'bg-orange-600',    // Better contrast than 500
     'bg-cyan-600',      // Better contrast than 500
-    'bg-emerald-600',   // Good contrast
-    'bg-rose-600'       // Good contrast
+    'bg-lime-600',      // Better contrast than 500
+    'bg-fuchsia-600',   // Better contrast than 500
+    'bg-indigo-600',    // Better contrast than 500
+    'bg-rose-600',      // Better contrast than 500
+    'bg-teal-600',      // Better contrast than 500
+    'bg-amber-700'      // Even darker for better contrast
   ];
   
   // Simple hash function to get consistent color for same name

@@ -22,16 +22,13 @@ const InitialsAvatar: React.FC<InitialsAvatarProps> = ({
     xl: 'w-24 h-24 text-2xl'
   };
   
-  const baseClasses = 'rounded-full flex items-center justify-center font-bold border-4 border-white shadow-md';
+  const baseClasses = 'rounded-full flex items-center justify-center font-bold text-white border-4 border-white shadow-lg drop-shadow-md';
   
   return (
     <div 
       className={`${colorClass} ${sizeClasses[size]} ${baseClasses} ${className}`}
       title={name}
-      style={{ 
-        color: '#FFFFFF',
-        textShadow: '1px 1px 2px rgba(0,0,0,0.7)'
-      }}
+      style={{ textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)' }}
     >
       {initials}
     </div>
