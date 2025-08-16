@@ -35,6 +35,8 @@ export class ApiService {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
+    
+    console.log('API Request:', url, options.method || 'GET');
 
     try {
       const response = await fetch(url, {
@@ -46,7 +48,16 @@ export class ApiService {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorText = await response.text();
+        console.error('API Error Response:', response.status, errorText);
+        
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { error: errorText || `HTTP error! status: ${response.status}` };
+        }
+        
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
