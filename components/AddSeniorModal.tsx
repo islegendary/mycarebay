@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { Senior, Ailment, Medication, Appointment, Contact } from '../types';
 
 interface AddSeniorModalProps {
@@ -18,16 +19,26 @@ const AddSeniorModal: React.FC<AddSeniorModalProps> = ({ isOpen, onClose, onSave
     contacts: []
   });
 
+  // Ensure all related data has valid UUIDs (for backward compatibility with old data)
+  const ensureValidUUIDs = (data: any[]) => {
+    return data.map(item => ({
+      ...item,
+      id: /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(item.id) 
+        ? item.id 
+        : uuidv4()
+    }));
+  };
+
   // Update form data when editingSenior changes
   useEffect(() => {
     if (editingSenior) {
       setFormData({
         name: editingSenior.name || '',
         relationship: editingSenior.relationship || '',
-        ailments: editingSenior.ailments || [],
-        medications: editingSenior.medications || [],
-        appointments: editingSenior.appointments || [],
-        contacts: editingSenior.contacts || []
+        ailments: ensureValidUUIDs(editingSenior.ailments || []),
+        medications: ensureValidUUIDs(editingSenior.medications || []),
+        appointments: ensureValidUUIDs(editingSenior.appointments || []),
+        contacts: ensureValidUUIDs(editingSenior.contacts || [])
       });
     } else {
       // Reset form when creating new senior
@@ -75,7 +86,7 @@ const AddSeniorModal: React.FC<AddSeniorModalProps> = ({ isOpen, onClose, onSave
     if (newAilment.name.trim()) {
       setFormData(prev => ({
         ...prev,
-        ailments: [...(prev.ailments || []), { id: `ail-${Date.now()}`, ...newAilment }]
+        ailments: [...(prev.ailments || []), { id: uuidv4(), ...newAilment }]
       }));
       setNewAilment({ name: '', notes: '' });
     }
@@ -92,7 +103,7 @@ const AddSeniorModal: React.FC<AddSeniorModalProps> = ({ isOpen, onClose, onSave
     if (newMedication.name.trim() && newMedication.dosage.trim()) {
       setFormData(prev => ({
         ...prev,
-        medications: [...(prev.medications || []), { id: `med-${Date.now()}`, ...newMedication }]
+        medications: [...(prev.medications || []), { id: uuidv4(), ...newMedication }]
       }));
       setNewMedication({ name: '', dosage: '', frequency: '' });
     }
@@ -109,7 +120,7 @@ const AddSeniorModal: React.FC<AddSeniorModalProps> = ({ isOpen, onClose, onSave
     if (newAppointment.date && newAppointment.doctor.trim()) {
       setFormData(prev => ({
         ...prev,
-        appointments: [...(prev.appointments || []), { id: `appt-${Date.now()}`, ...newAppointment }]
+        appointments: [...(prev.appointments || []), { id: uuidv4(), ...newAppointment }]
       }));
       setNewAppointment({ date: '', time: '', doctor: '', purpose: '', location: '' });
     }
@@ -126,7 +137,7 @@ const AddSeniorModal: React.FC<AddSeniorModalProps> = ({ isOpen, onClose, onSave
     if (newContact.name.trim() && newContact.phone.trim()) {
       setFormData(prev => ({
         ...prev,
-        contacts: [...(prev.contacts || []), { id: `con-${Date.now()}`, ...newContact }]
+        contacts: [...(prev.contacts || []), { id: uuidv4(), ...newContact }]
       }));
       setNewContact({ name: '', type: 'Doctor', phone: '', email: '' });
     }
