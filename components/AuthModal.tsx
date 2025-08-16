@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { Plan, User } from '../types';
 
 interface AuthModalProps {
@@ -22,7 +23,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ mode: initialMode, plan, onClose,
         event.preventDefault();
         // Create user object for authentication
         const authUser: User = {
-            id: `user_${Date.now()}`,
+            id: uuidv4(),
             email,
             name: email.split('@')[0], // Use email prefix as name for demo
             plan: currentMode === 'signup' ? (plan || 'free') : 'pro',
