@@ -1,5 +1,7 @@
 /* Tailwind CSS directives */
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* ========================================
    MyCareBay - Centralized Styling System
