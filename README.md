@@ -1,230 +1,145 @@
-# MyCareBay - AI-Powered Senior Care Assistant
+# MyCareBay
 
-MyCareBay is a comprehensive web application designed to help caregivers and families manage senior care with AI-powered assistance. The platform provides personalized care advice, facility checklists, and senior profile management with full data persistence.
+A comprehensive senior care management platform that empowers families with AI-powered care insights and personalized facility checklists to make informed decisions about their loved ones' care needs.
 
-## 🚀 Features
+## What is MyCareBay?
 
-### Core Features
-- **Senior Profile Management**: Create and manage detailed profiles with ailments, medications, appointments, and contacts
-- **AI-Powered Care Advisor**: Get instant, personalized care advice using Google Gemini AI
-- **Facility Checklist Generator**: Generate customized checklists for long-term care facility visits
-- **Data Persistence**: All senior information is securely stored and persists across sessions
+MyCareBay helps families navigate senior care by providing:
+- **AI Care Advisor**: Personalized care recommendations based on health profiles
+- **Smart Facility Checklists**: Custom inspection lists tailored to specific needs
+- **Senior Profile Management**: Secure storage and management of health information
+- **Care Planning Tools**: Evidence-based guidance for care decisions
 
-### AI Features
-- **Real-time Care Advice**: Ask questions and get instant AI-powered responses
-- **Facility Assessment**: Generate personalized facility visit checklists
-- **Condition-Specific Guidance**: Tailored advice based on senior's ailments
-- **Source Attribution**: All AI responses include verified sources
-
-### User Experience
-- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
-- **Intuitive Interface**: Clean, modern UI with Tailwind CSS
-- **Real-time Updates**: Instant feedback and loading states
-- **Secure Authentication**: User accounts with secure data storage
-
-## 🛠️ Technology Stack
-
-### Frontend
-- **React 19** with TypeScript for type safety
-- **Vite** for fast development and building  
-- **Tailwind CSS** for responsive styling
-- **UUID** for reliable data management
-
-### Backend
-- **Vercel Serverless Functions** for scalable API
-- **Supabase** (PostgreSQL) for reliable data storage
-- **Google Gemini AI** for intelligent responses
-
-### Deployment & Infrastructure
-- **Vercel** for hosting and serverless functions
-- **GitHub** for version control and CI/CD
-- **Environment Variables** for secure configuration
-
-## 📦 Installation & Setup
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
-- npm or yarn
+- Node.js 18+
 - Supabase account
-- Google Gemini API key
+- Google Gemini AI API key
 
-### Local Development
+### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd mycarebay
-   ```
+```bash
+# Clone and install
+git clone https://github.com/yourusername/mycarebay.git
+cd mycarebay
+npm install
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+# Set up environment
+cp env.example .env.local
+# Edit .env.local with your credentials
 
-3. **Set up environment variables**
-   ```bash
-   cp env.example .env.local
-   ```
-   
-   Fill in your environment variables:
-   ```env
-   SUPABASE_URL=your_supabase_url
-   SUPABASE_ANON_KEY=your_supabase_anon_key
-   GEMINI_API_KEY=your_gemini_api_key
-   NODE_ENV=development
-   ```
+# Initialize database
+npm run test:supabase
 
-4. **Set up the database**
-   ```bash
-   # Run the Supabase migration script
-   npm run test:supabase
-   ```
+# Start development
+npm run dev:full
+```
 
-5. **Start the development server**
-   ```bash
-   npm run dev:full
-   ```
+Visit <http://localhost:5173> to see the app running.
 
-   This starts both the frontend (Vite) and backend (Express) servers concurrently.
+## 🏗️ Tech Stack
 
-### Available Scripts
-
-- `npm run dev` - Start Vite development server
-- `npm run server` - Start Express backend server
-- `npm run dev:full` - Start both frontend and backend 
-- `npm run build` - Build for production
-- `npm run test:supabase` - Test Supabase connection
-- `npm run preview` - Preview production build
-
-## 🗄️ Database Setup
-
-### Supabase Configuration
-
-1. Create a new Supabase project
-2. Run the migration script in `supabase-migration.sql`
-3. Update your environment variables with Supabase credentials
-
-### Database Schema
-
-The application uses the following main tables:
-- `users` - User authentication and profiles
-- `seniors` - Senior profiles with personal information
-- `ailments` - Medical conditions and ailments
-- `medications` - Medication tracking
-
-## 🚀 Deployment
-
-### Vercel Deployment
-
-1. **Push to GitHub**
-   ```bash
-   git add .
-   git commit -m "Prepare for deployment"
-   git push origin main
-   ```
-
-2. **Deploy to Vercel**
-   - Connect your GitHub repository to Vercel
-   - Set environment variables in Vercel dashboard
-   - Deploy automatically on push to main branch
-
-### Environment Variables for Production
-
-Set these in your Vercel dashboard:
-- `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
-- `GEMINI_API_KEY`
-- `NODE_ENV=production`
+**Frontend**: React 19 + TypeScript + Vite + Tailwind CSS  
+**Backend**: Express.js (local) / Vercel Serverless (production)  
+**Database**: Supabase (PostgreSQL)  
+**AI**: Google Gemini API  
+**Deployment**: Vercel
 
 ## 📁 Project Structure
 
 ```
 mycarebay/
-├── api/                    # Vercel serverless functions
-│   ├── auth/
-│   └── seniors/
-├── components/             # React components
-│   ├── CareAdvisor.tsx    # AI-powered care advice
-│   ├── Dashboard.tsx      # Main dashboard
-│   ├── SeniorProfile.tsx  # Senior profile view
-│   └── ...
-├── services/              # API and AI services
-│   ├── apiService.ts      # Backend API client
-│   └── geminiService.ts   # Google Gemini AI integration
-├── server/                # Express backend (development)
-├── utils/                 # Utility functions
-├── types.ts              # TypeScript type definitions
-├── vite.config.ts        # Vite configuration
-├── vercel.json           # Vercel deployment config
-└── README.md             # This file
+├── components/          # React UI components
+├── api/                # Vercel serverless functions
+├── server/             # Local Express development server
+├── services/           # API clients and AI integration
+├── types.ts            # TypeScript definitions
+└── supabase-migration.sql
 ```
 
-## 🔧 Configuration
+## 🔧 Development Commands
 
-### AI Integration
-The application uses Google Gemini AI for:
-- Care advice generation
-- Facility checklist creation
-- Personalized recommendations
+```bash
+npm run dev:full        # Start both frontend and backend
+npm run dev             # Frontend only (Vite dev server)
+npm run server          # Backend only (Express server)
+npm run build           # Build for production
+npm run test:supabase   # Test database connection
+```
 
-### Database
-- **Development**: Local Express server with Supabase
-- **Production**: Vercel serverless functions with Supabase
+## 📊 Key Features
 
-## 🧪 Testing
+### AI-Powered Care Advice
+Get personalized care recommendations based on detailed senior profiles including health conditions, medications, and care needs.
 
-### Local Testing
-1. Start the development server: `npm run dev:full`
-2. Test Supabase connection: `npm run test:supabase`
-3. Verify all features work correctly
+### Dynamic Facility Checklists
+Generate customized inspection checklists for care facilities, tailored to specific ailments and requirements.
 
-### Testing Checklist
-See `TESTING_CHECKLIST.md` for comprehensive testing procedures.
+### Secure Profile Management
+Store and manage senior health information with proper authentication and data protection.
 
-## 📝 API Endpoints
+## 🚀 Deployment
 
-### Authentication
-- `POST /api/auth/login` - User login
+### Local Development
+```bash
+npm run dev:full
+```
+Access at <http://localhost:5173> (frontend) and <http://localhost:3001> (API)
 
-### Seniors
-- `GET /api/seniors/:userId` - Get seniors for user
-- `POST /api/seniors` - Create new senior
-- `PUT /api/seniors/:seniorId` - Update senior
-- `DELETE /api/seniors/:seniorId` - Delete senior
+### Production (Vercel)
+1. Connect repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Deploy automatically on push to `main` branch
+
+**Required Environment Variables:**
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY` 
+- `GEMINI_API_KEY`
+- `NODE_ENV=production`
+
+## 🔒 Environment Setup
+
+Create `.env.local`:
+```env
+SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_ANON_KEY=your-supabase-anon-key
+GEMINI_API_KEY=your-gemini-api-key
+NODE_ENV=development
+```
+
+## 🧪 API Endpoints
+
+**Health**: `GET /api/health`  
+**Authentication**: `POST /api/auth/login`  
+**Seniors**: `GET/POST/DELETE /api/seniors/*`  
+
+All endpoints work identically in local development and production.
+
+## 🔍 Troubleshooting
+
+**Build Issues**: Ensure `@vitejs/plugin-react` is installed  
+**Database Issues**: Run `npm run test:supabase` to verify connection  
+**API 404s**: Check that Express server is running on port 3001  
+**UUID Errors**: Verify senior ID format in requests
+
+## 📚 Documentation
+
+- `STYLE_GUIDE.md` - Coding standards and conventions
+- `TESTING_CHECKLIST.md` - Manual and automated testing procedures  
+- `DEPLOYMENT_CHECKLIST.md` - Production deployment guide
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Follow the style guide and run tests
+4. Submit a pull request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see `LICENSE` file for details.
 
-## 🆘 Support
+---
 
-For support and questions:
-- Check the documentation
-- Review the testing checklist
-- Open an issue on GitHub
-
-## 🔄 Recent Updates
-
-### Latest Features & Fixes
-- ✅ **Critical Data Persistence Fix**: Resolved UUID generation issues for reliable data saving
-- ✅ **Backward Compatibility**: Automatic conversion of legacy data to proper UUID format
-- ✅ **Avatar Display**: Fixed initials visibility with proper Tailwind CSS implementation
-- ✅ **AI-Powered Care Advisor**: Personalized advice with Google Gemini AI
-- ✅ **Facility Checklist Generator**: Customized facility assessment tools
-- ✅ **Complete CRUD Operations**: Add, edit, delete senior profiles with full data persistence
-
-### Technical Improvements
-- ✅ **UUID Data Integrity**: All database operations now use proper UUIDs for PostgreSQL compatibility
-- ✅ **Vercel Deployment**: Optimized for serverless functions with PostCSS Tailwind setup
-- ✅ **Error Handling**: Enhanced API error logging and user feedback
-- ✅ **Tailwind CSS**: Full migration from CDN to PostCSS with dynamic class safelist
-- ✅ **TypeScript**: Complete type safety across frontend and backend
-- ✅ **Performance**: Optimized loading states and responsive design
+**Need Help?** Check the troubleshooting section or open an issue in the repository.

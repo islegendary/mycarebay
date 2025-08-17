@@ -18,6 +18,7 @@ dist-ssr
 .env.development.local
 .env.test.local
 .env.production.local
+env.local
 
 # Database files
 *.sqlite
@@ -58,5 +59,9 @@ jspm_packages/
 # Output of 'npm pack'
 *.tgz
 
-# Yarn Integrity file
-.yarn-integrity
+# Vercel working directory
+.vercel
+
+# Backup/duplicate directories
+mycarebay3/
+maycarebay3/

@@ -2,53 +2,93 @@
 
 ## Project Overview
 
-MyCareBay is a full-stack web app for senior care management, featuring AI-powered advice and facility checklists. It uses React (TypeScript, Vite), Node.js/Express, Supabase (PostgreSQL), and Google Gemini AI. The app is deployed on Vercel using serverless functions in the `api/` directory.
+MyCareBay is a comprehensive senior care management platform providing AI-powered care advice and facility checklists. Built with React 19 + TypeScript + Vite, Express.js/Vercel serverless functions, Supabase (PostgreSQL), and Google Gemini AI.
 
-## Key Architecture & Data Flow
+## Architecture
 
-- **Frontend**: React components in `components/` (e.g., `CareAdvisor.tsx`, `Dashboard.tsx`).
-- **Backend**: Vercel serverless functions in `api/` (auth, seniors CRUD). Local Express server for development (`server/`).
-- **Database**: Supabase/PostgreSQL, schema in `supabase-migration.sql`.
-- **AI Integration**: All AI features (advice, checklists) use `services/geminiService.ts` (Google Gemini API). AI responses are personalized using senior profile data.
-- **Types**: Shared types in `types.ts`.
+**Frontend**: React components in `components/` with TypeScript, Tailwind CSS  
+**Backend**: Local Express (`server/index.js`) + Vercel serverless functions (`api/`)  
+**Database**: Supabase PostgreSQL, schema in `supabase-migration.sql`  
+**AI**: Google Gemini via `services/geminiService.ts`  
+**Types**: Centralized in `types.ts`
 
-## Developer Workflows
+## Core Workflows
 
-- **Install**: `npm install`
-- **Local Dev**: `npm run dev:full` (starts frontend + backend)
-- **Test DB**: `npm run test:supabase`
-- **Build**: `npm run build`
-- **Preview**: `npm run preview`
-- **Deploy**: Push to `main` branch, Vercel auto-deploys
-- **Env Vars**: Set in `.env.local` (see `env.example`)
+```bash
+npm install              # Install dependencies
+npm run dev:full         # Start frontend + backend
+npm run test:supabase    # Test database connection
+npm run build            # Production build
+vercel --prod            # Deploy to production
+```
 
-## Project-Specific Patterns
+## Key Patterns
 
-- **AI Features**: Use `getCareAdvice`, `generateFacilityChecklist` from `geminiService.ts`. Always check for API key presence.
-- **Checklist Generation**: Facility checklists are tailored by senior ailments; see system instructions in `geminiService.ts` for prompt structure.
-- **Component Structure**: Major UI logic in `components/`, with loading/error states and markdown rendering for AI output.
-- **API Endpoints**: All backend logic in `api/` (Vercel functions). No monolithic server in production.
-- **Testing**: See `TESTING_CHECKLIST.md` for manual and automated test flows.
+### AI Integration
 
-## Integration & Conventions
+- Use `getCareAdvice()` and `generateFacilityChecklist()` from `geminiService.ts`
+- Always check for API key presence and provide fallbacks
+- AI responses are personalized using senior profile data
 
-- **Supabase**: All DB access via Supabase client; credentials in env vars.
-- **Google Gemini**: API key required for AI features; fallback messages if missing.
-- **TypeScript**: Strict typing enforced; all new code should use types from `types.ts`.
-- **Styling**: Tailwind CSS utility classes throughout.
-- **Error Handling**: User-facing errors are friendly; log technical errors to console only.
+### API Structure
 
-## Examples
+- Local development: Express routes in `server/index.js`
+- Production: Vercel serverless functions in `api/`
+- Route parity between both environments is critical
+- All endpoints prefixed with `/api`
 
-- To add a new AI-powered feature, extend `geminiService.ts` and connect via a new or existing component.
-- To add a new API route, create a file in `api/` (see `api/seniors/[seniorId].js`).
+### Component Standards
 
-## References
+- TypeScript interfaces for all props
+- Loading/error states for async operations
+- Markdown rendering for AI-generated content
+- Responsive design with Tailwind CSS
 
-- See `README.md` for setup, deployment, and architecture.
-- See `DEPLOYMENT_CHECKLIST.md` and `TESTING_CHECKLIST.md` for release and QA steps.
-- See `vercel.json` for deployment config.
+### Database Operations
+
+- All access via Supabase client
+- UUID primary keys, proper foreign key relationships
+- Row Level Security (RLS) for data protection
+- Use parameterized queries to prevent injection
+
+## Environment Requirements
+
+**Required Variables:**
+
+- `SUPABASE_URL` - Supabase project URL
+- `SUPABASE_ANON_KEY` - Supabase anonymous key
+- `GEMINI_API_KEY` - Google AI API key
+- `NODE_ENV` - Environment (development/production)
+
+## Common Tasks
+
+**Add AI Feature**: Extend `geminiService.ts`, create/update component  
+**Add API Endpoint**: Create matching files in both `server/` and `api/`  
+**Database Changes**: Update `supabase-migration.sql` and test locally  
+**New Component**: Follow TypeScript patterns in existing components
+
+## Testing & Deployment
+
+- Manual testing procedures in `TESTING_CHECKLIST.md`
+- Deployment steps in `DEPLOYMENT_CHECKLIST.md`
+- Code standards in `STYLE_GUIDE.md`
+- Local testing: `npm run test:supabase`
+- Production deployment: Push to `main` branch triggers auto-deploy
+
+## Error Handling
+
+- User-facing: Friendly error messages
+- Development: Console logging for debugging
+- API failures: Graceful degradation with fallback content
+- Missing API keys: Clear instructions for setup
+
+## Security Notes
+
+- JWT authentication via Supabase
+- Environment variables for all secrets
+- Input validation on all user data
+- RLS policies enforce data access controls
 
 ---
 
-For questions, review the documentation or open an issue.
+For detailed setup and architecture, see `README.md`. For specific procedures, reference the appropriate checklist documentation.

@@ -1,186 +1,271 @@
-# MyCareBay Style Guide
+# Style Guide - MyCareBay
 
-## Overview
-This document outlines the centralized styling system for MyCareBay, ensuring consistent design across all components.
+Essential coding standards and conventions for consistent, maintainable code.
 
-## Design Tokens
+## TypeScript Standards
 
-### Colors
-All colors are defined as CSS custom properties in `index.css`:
+### Type Definitions
 
-```css
-:root {
-  /* Brand Colors */
-  --brand-blue-light: #E0F2FE;
-  --brand-blue: #0EA5E9;
-  --brand-blue-dark: #0369A1;
-  
-  /* Gray Scale */
-  --brand-gray-light: #F8FAFC;
-  --brand-gray-medium: #475569;
-  --brand-gray: #334155;
-  --brand-gray-dark: #1E293B;
-  
-  /* Semantic Colors */
-  --text-primary: var(--brand-gray-dark);
-  --text-secondary: var(--brand-gray-medium);
-  --text-muted: var(--brand-gray);
-  --text-inverse: #FFFFFF;
+```typescript
+// ✅ Good - Explicit interfaces in types.ts
+interface Senior {
+  id: string;
+  name: string;
+  age: number | null;
+  ailments: string[];
+}
+
+// ❌ Avoid 'any' types
+const data: any = getData(); // Bad
+```
+
+### Function Signatures
+
+```typescript
+// ✅ Always include parameter and return types
+async function getCareAdvice(
+  seniorProfile: Senior,
+  question: string
+): Promise<string> {
+  // Implementation
 }
 ```
 
-### Typography
+## React Component Standards
 
-#### Headings
-- **Heading 1**: `.text-heading-1` - 3rem, 800 weight
-- **Heading 2**: `.text-heading-2` - 2.25rem, 700 weight
-- **Heading 3**: `.text-heading-3` - 1.875rem, 600 weight
-- **Heading 4**: `.text-heading-4` - 1.5rem, 600 weight
+### Component Structure
+```typescript
+import React, { useState } from 'react';
+import { Senior } from '../types';
 
-#### Body Text
-- **Large**: `.text-body-large` - 1.125rem, 400 weight
-- **Regular**: `.text-body` - 1rem, 400 weight
-- **Small**: `.text-body-small` - 0.875rem, 400 weight
-- **Caption**: `.text-caption` - 0.75rem, 500 weight
+interface SeniorCardProps {
+  senior: Senior;
+  onEdit: (senior: Senior) => void;
+  onDelete: (id: string) => void;
+}
 
-### Buttons
+export const SeniorCard: React.FC<SeniorCardProps> = ({
+  senior,
+  onEdit,
+  onDelete,
+}) => {
+  const [loading, setLoading] = useState(false);
 
-#### Primary Button
-```html
-<button class="btn btn-primary">Primary Action</button>
+  const handleEdit = () => onEdit(senior);
+
+  return (
+    <div className="bg-white rounded-lg shadow-md p-6">
+      {/* Component content */}
+    </div>
+  );
+};
 ```
 
-#### Secondary Button
-```html
-<button class="btn btn-secondary">Secondary Action</button>
+### Event Handlers
+```typescript
+// ✅ Properly typed events
+const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  // Handle submission
+};
+
+const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { name, value } = e.target;
+  setData(prev => ({ ...prev, [name]: value }));
+};
 ```
 
-#### Button Sizes
-- **Small**: `.btn-sm`
-- **Regular**: (default)
-- **Large**: `.btn-lg`
-- **Extra Large**: `.btn-xl`
+## Styling with Tailwind
 
-### Cards
-
-#### Basic Card
-```html
-<div class="card">
-  <div class="card-header">
-    <h3>Card Title</h3>
-  </div>
-  <div class="card-body">
-    <p>Card content goes here</p>
-  </div>
-</div>
+### Responsive Design
+```tsx
+// ✅ Mobile-first approach
+<div className="
+  grid grid-cols-1 gap-4
+  md:grid-cols-2 md:gap-6
+  lg:grid-cols-3
+">
 ```
 
-### Forms
+### Color Consistency
+- **Primary**: `blue-600`, `blue-700`
+- **Secondary**: `gray-200`, `gray-800`
+- **Success**: `green-600`
+- **Error**: `red-600`
 
-#### Form Group
-```html
-<div class="form-group">
-  <label class="form-label">Label</label>
-  <input class="form-input" type="text" placeholder="Enter text">
-</div>
+### Button Patterns
+```tsx
+// Primary button
+<button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+  Primary Action
+</button>
+
+// Secondary button  
+<button className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
+  Secondary Action
+</button>
 ```
 
-#### Textarea
-```html
-<textarea class="form-input form-textarea" placeholder="Enter text"></textarea>
+## File Organization
+
+### Directory Structure
+```
+src/
+├── components/     # UI components
+├── services/       # API services  
+├── utils/         # Helper functions
+├── types.ts       # Type definitions
+└── constants.ts   # App constants
 ```
 
-### Navigation
+### Import Order
+```typescript
+// React imports
+import React, { useState } from 'react';
 
-#### Nav Item
-```html
-<a class="nav-item" href="#">Navigation Link</a>
-<a class="nav-item active" href="#">Active Link</a>
-<a class="nav-item" href="#" disabled>Disabled Link</a>
+// Third-party libraries
+import { format } from 'date-fns';
+
+// Internal services
+import { getCareAdvice } from '../services/geminiService';
+
+// Internal components
+import { SeniorCard } from './SeniorCard';
+
+// Types and utils
+import { Senior } from '../types';
 ```
 
-### Badges
+## API Design
 
-#### Plan Badges
-```html
-<span class="badge badge-free">Free</span>
-<span class="badge badge-plus">Plus</span>
-<span class="badge badge-pro">Pro</span>
+### Service Structure
+```typescript
+class ApiError extends Error {
+  constructor(message: string, public status: number) {
+    super(message);
+  }
+}
+
+export const apiService = {
+  async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
+    const response = await fetch(`/api${endpoint}`, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new ApiError(error.message, response.status);
+    }
+
+    return response.json();
+  },
+};
 ```
 
-## Usage Guidelines
-
-### Text Colors
-- **Primary text**: Use `var(--text-primary)` for headings and important content
-- **Secondary text**: Use `var(--text-secondary)` for body text and descriptions
-- **Muted text**: Use `var(--text-muted)` for captions and less important info
-
-### Button Usage
-- **Primary buttons**: Use for main actions (Submit, Save, Continue)
-- **Secondary buttons**: Use for alternative actions (Cancel, Back, Edit)
-
-### Spacing
-Use the spacing variables for consistent spacing:
-- `var(--spacing-xs)`: 0.25rem
-- `var(--spacing-sm)`: 0.5rem
-- `var(--spacing-md)`: 1rem
-- `var(--spacing-lg)`: 1.5rem
-- `var(--spacing-xl)`: 2rem
-- `var(--spacing-2xl)`: 3rem
-
-### Shadows
-- `var(--shadow-sm)`: Subtle elevation
-- `var(--shadow-md)`: Medium elevation
-- `var(--shadow-lg)`: High elevation
-
-## Accessibility
-
-### Color Contrast
-All text colors meet WCAG AA standards:
-- Primary text: 4.5:1 contrast ratio
-- Secondary text: 4.5:1 contrast ratio
-- Large text: 3:1 contrast ratio
-
-### Focus States
-All interactive elements have visible focus states using `var(--brand-blue)`.
-
-### Reduced Motion
-Animations respect `prefers-reduced-motion` media query.
-
-## Responsive Design
-
-### Breakpoints
-- **Mobile**: < 768px
-- **Tablet**: 768px - 1024px
-- **Desktop**: > 1024px
-
-### Mobile Adjustments
-- Headings scale down on mobile
-- Button padding adjusts for touch targets
-- Spacing reduces for smaller screens
-
-## Best Practices
-
-1. **Always use design tokens** instead of hardcoded values
-2. **Use semantic class names** for better maintainability
-3. **Test with different screen sizes** and accessibility tools
-4. **Keep components consistent** with the established patterns
-5. **Use the centralized CSS file** for all styling decisions
-
-## File Structure
-
-```
-mycarebay/
-├── index.css          # Centralized styling system
-├── STYLE_GUIDE.md     # This document
-├── components/        # React components
-└── index.html         # Tailwind config (references CSS vars)
+### Error Handling
+```typescript
+// ✅ Consistent error handling
+try {
+  const result = await apiService.getSeniors();
+  setSeniors(result);
+} catch (error) {
+  const message = error instanceof ApiError 
+    ? error.message 
+    : 'An unexpected error occurred';
+  setError(message);
+}
 ```
 
-## Maintenance
+## Database Conventions
 
-When updating styles:
-1. Modify the CSS custom properties in `index.css`
-2. Update this style guide if adding new patterns
-3. Test across all components for consistency
-4. Ensure accessibility standards are maintained
+### Table Structure
+```sql
+CREATE TABLE seniors (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  age INTEGER CHECK (age > 0 AND age < 150),
+  ailments TEXT[] DEFAULT '{}',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+### Query Patterns
+```typescript
+export async function getSeniorsByUser(userId: string): Promise<Senior[]> {
+  const { data, error } = await supabase
+    .from('seniors')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw new Error(`Failed to fetch seniors: ${error.message}`);
+  return data || [];
+}
+```
+
+## Performance Guidelines
+
+### React Optimization
+```typescript
+// ✅ Memoize expensive calculations
+const sortedSeniors = useMemo(() => 
+  seniors.sort((a, b) => a.name.localeCompare(b.name)), 
+  [seniors]
+);
+
+// ✅ Memoize callbacks
+const handleUpdate = useCallback((senior: Senior) => {
+  setSeniors(prev => prev.map(s => s.id === senior.id ? senior : s));
+}, []);
+```
+
+## Security Best Practices
+
+### Input Validation
+```typescript
+const validateSeniorData = (data: Partial<Senior>): string[] => {
+  const errors: string[] = [];
+  
+  if (!data.name || data.name.trim().length < 2) {
+    errors.push('Name must be at least 2 characters');
+  }
+  
+  if (data.age && (data.age < 1 || data.age > 150)) {
+    errors.push('Age must be between 1 and 150');
+  }
+  
+  return errors;
+};
+```
+
+### Environment Variables
+```typescript
+const requiredEnvVars = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'GEMINI_API_KEY'];
+
+requiredEnvVars.forEach(envVar => {
+  if (!process.env[envVar]) {
+    throw new Error(`Missing required environment variable: ${envVar}`);
+  }
+});
+```
+
+## Code Review Checklist
+
+### Before Submitting
+- [ ] TypeScript errors resolved
+- [ ] Component props typed
+- [ ] Error handling implemented
+- [ ] Responsive design tested
+- [ ] Loading states included
+
+### Review Criteria
+- [ ] Code follows established patterns
+- [ ] Performance considerations addressed
+- [ ] Security best practices followed
+- [ ] Documentation updated if needed
+
+---
+
+Follow these standards for all contributions to maintain code quality and consistency.

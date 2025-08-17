@@ -35,9 +35,13 @@ console.log('Connected to Supabase');
 
 // API Routes
 
-// Get seniors for a user
-app.get('/api/seniors/:userId', async (req, res) => {
-  const { userId } = req.params;
+// Get seniors for a user (matches Vercel route)
+app.get('/api/seniors/user', async (req, res) => {
+  const { userId } = req.query;
+
+  if (!userId) {
+    return res.status(400).json({ error: 'User ID is required' });
+  }
 
   try {
     // Get seniors
@@ -244,7 +248,54 @@ app.post('/api/seniors', async (req, res) => {
   }
 });
 
-// Delete a senior
+// Delete a senior (matches Vercel route) - MUST come before /:seniorId route
+app.delete('/api/seniors/delete', async (req, res) => {
+  const { seniorId, userId } = req.query;
+
+  if (!seniorId || !userId) {
+    return res.status(400).json({ error: 'Senior ID and User ID are required' });
+  }
+
+  try {
+    // Verify the senior belongs to the user
+    const { data: senior, error: fetchError } = await supabase
+      .from('seniors')
+      .select('*')
+      .eq('id', seniorId)
+      .eq('user_id', userId)
+      .single();
+
+    if (fetchError || !senior) {
+      return res.status(404).json({ error: 'Senior not found or access denied' });
+    }
+
+    // Delete related data first (due to foreign key constraints)
+    await Promise.all([
+      supabase.from('ailments').delete().eq('senior_id', seniorId),
+      supabase.from('medications').delete().eq('senior_id', seniorId),
+      supabase.from('appointments').delete().eq('senior_id', seniorId),
+      supabase.from('contacts').delete().eq('senior_id', seniorId)
+    ]);
+
+    // Delete the senior
+    const { data, error } = await supabase
+      .from('seniors')
+      .delete()
+      .eq('id', seniorId);
+
+    if (error) {
+      console.error('Error deleting senior:', error);
+      return res.status(500).json({ error: 'Failed to delete senior' });
+    }
+
+    res.json({ success: true, message: 'Senior deleted successfully' });
+  } catch (error) {
+    console.error('Error in deleteSenior:', error);
+    res.status(500).json({ error: 'Failed to delete senior' });
+  }
+});
+
+// Delete a senior (generic route)
 app.delete('/api/seniors/:seniorId', async (req, res) => {
   const { seniorId } = req.params;
   const { userId } = req.query;
