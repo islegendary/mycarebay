@@ -398,6 +398,108 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
+// AI Endpoints
+app.post('/api/ai/care-advice', async (req, res) => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  
+  if (!apiKey) {
+    return res.status(500).json({ error: 'API key not configured' });
+  }
+
+  try {
+    const { GoogleGenAI } = await import('@google/genai');
+    const { seniorProfile, question } = req.body;
+    
+    if (!seniorProfile || !question) {
+      return res.status(400).json({ error: 'Missing seniorProfile or question' });
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `You are a knowledgeable senior care advisor. Please provide personalized care advice based on the following information:
+
+Senior Profile:
+- Name: ${seniorProfile.name}
+- Age: ${seniorProfile.age}
+- Ailments: ${seniorProfile.ailments ? seniorProfile.ailments.join(', ') : 'None specified'}
+- Medications: ${seniorProfile.medications ? seniorProfile.medications.join(', ') : 'None specified'}
+- Care Level: ${seniorProfile.care_level || 'Not specified'}
+- Mobility Level: ${seniorProfile.mobility_level || 'Not specified'}
+- Dietary Restrictions: ${seniorProfile.dietary_restrictions ? seniorProfile.dietary_restrictions.join(', ') : 'None specified'}
+- Additional Notes: ${seniorProfile.notes || 'None'}
+
+Question: ${question}
+
+Please provide practical, actionable advice that considers their specific health conditions and circumstances. Format your response in clear, easy-to-read sections.`;
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const advice = response.text();
+
+    res.status(200).json({ advice });
+  } catch (error) {
+    console.error('Error generating care advice:', error);
+    res.status(500).json({ error: 'Failed to generate care advice' });
+  }
+});
+
+app.post('/api/ai/facility-checklist', async (req, res) => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  
+  if (!apiKey) {
+    return res.status(500).json({ error: 'API key not configured' });
+  }
+
+  try {
+    const { GoogleGenAI } = await import('@google/genai');
+    const { seniorProfile } = req.body;
+    
+    if (!seniorProfile) {
+      return res.status(400).json({ error: 'Missing seniorProfile' });
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const ailments = seniorProfile.ailments || [];
+    const medications = seniorProfile.medications || [];
+    const careLevel = seniorProfile.care_level || 'unknown';
+    const mobilityLevel = seniorProfile.mobility_level || 'unknown';
+
+    const prompt = `Generate a comprehensive facility inspection checklist for evaluating senior care facilities for ${seniorProfile.name}.
+
+Senior Profile Details:
+- Age: ${seniorProfile.age}
+- Health Conditions: ${ailments.length > 0 ? ailments.join(', ') : 'None specified'}
+- Current Medications: ${medications.length > 0 ? medications.join(', ') : 'None specified'}
+- Care Level Needed: ${careLevel}
+- Mobility Level: ${mobilityLevel}
+- Special Dietary Needs: ${seniorProfile.dietary_restrictions ? seniorProfile.dietary_restrictions.join(', ') : 'None'}
+
+Create a detailed checklist organized by categories that addresses their specific needs. Include:
+
+1. **Medical Care & Health Services**
+2. **Safety & Accessibility** 
+3. **Staff Qualifications & Ratios**
+4. **Living Environment & Amenities**
+5. **Nutrition & Dining**
+6. **Activities & Social Programs**
+7. **Emergency Procedures**
+
+For each category, provide 5-8 specific questions or items to check, tailored to the senior's health conditions and needs. Format as a clear, printable checklist with checkboxes.`;
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const checklist = response.text();
+
+    res.status(200).json({ checklist });
+  } catch (error) {
+    console.error('Error generating facility checklist:', error);
+    res.status(500).json({ error: 'Failed to generate facility checklist' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`API available at http://localhost:${PORT}/api`);
