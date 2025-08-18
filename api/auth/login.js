@@ -6,7 +6,7 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
 // Debug logging for environment variables
 console.log('Supabase URL:', supabaseUrl ? 'Set' : 'Missing');
-console.log('Supabase Key:', supabaseKey ? 'Set' : 'Missing');
+
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('Missing Supabase environment variables');

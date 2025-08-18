@@ -6,7 +6,7 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
 // Debug logging for environment variables
 console.log('Supabase URL:', supabaseUrl ? 'Set' : 'Missing');
-console.log('Supabase Key:', supabaseKey ? 'Set' : 'Missing');
+
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('Missing Supabase environment variables');
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
     const isUpdate = !!senior.id;
     const seniorId = senior.id || uuidv4();
     
-    console.log('Save senior request:', { userId, seniorName: senior.name, isUpdate, seniorId });
+
 
     // Start a transaction
     const { data: seniorData, error: seniorError } = await supabase

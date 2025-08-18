@@ -3,15 +3,10 @@ import type { CareAdvice, GroundingSource, ChecklistResponse, Senior } from '@/t
 
 // Ensure the API key is available as an environment variable
 const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
-console.log('API Key available:', !!apiKey);
-console.log('API Key length:', apiKey ? apiKey.length : 0);
 let ai: GoogleGenAI | null = null;
 
 if (apiKey) {
     ai = new GoogleGenAI({ apiKey });
-    console.log('AI client initialized');
-} else {
-    console.log('No API key found, AI features disabled');
 }
 
 /**
@@ -63,11 +58,7 @@ export const getAilmentEducation = async (ailmentName: string): Promise<string> 
  * @returns An object containing the textual advice and a list of sources.
  */
 export const getCareAdvice = async (question: string): Promise<CareAdvice> => {
-    console.log('getCareAdvice called with question:', question);
-    console.log('AI client available:', !!ai);
-
     if (!ai) {
-        console.log('AI client not available, returning fallback message');
         return {
             text: "AI features are not available. Please check your configuration.",
             sources: []
@@ -103,12 +94,7 @@ export const getCareAdvice = async (question: string): Promise<CareAdvice> => {
  * @returns A structured checklist object.
  */
 export const generateFacilityChecklist = async (topic: string, selectedSenior?: Senior | null): Promise<ChecklistResponse> => {
-    console.log('generateFacilityChecklist called with topic:', topic);
-    console.log('selectedSenior:', selectedSenior);
-    console.log('AI client available:', !!ai);
-
     if (!ai) {
-        console.log('AI client not available, returning fallback checklist');
         return {
             checklist: [{
                 category: "AI Not Available",

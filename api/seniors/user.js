@@ -5,7 +5,7 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
 // Debug logging for environment variables
 console.log('Supabase URL:', supabaseUrl ? 'Set' : 'Missing');
-console.log('Supabase Key:', supabaseKey ? 'Set' : 'Missing');
+
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('Missing Supabase environment variables');
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
 
   try {
     const { userId } = req.query;
-    console.log('Fetching seniors for userId:', userId);
+
 
     if (!userId) {
       return res.status(400).json({ error: 'User ID is required' });
@@ -54,7 +54,7 @@ export default async function handler(req, res) {
     }
 
     if (!seniors || seniors.length === 0) {
-      console.log('No seniors found for user:', userId);
+  
       return res.status(200).json([]);
     }
 

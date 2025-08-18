@@ -36,7 +36,7 @@ export class ApiService {
   ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
     
-    console.log('API Request:', url, options.method || 'GET');
+    
 
     try {
       const response = await fetch(url, {
