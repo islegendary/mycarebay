@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Senior, Ailment, Medication, Appointment, Contact } from '../types';
+import { Senior, Ailment, Medication, Appointment, Contact } from '@/types';
 
 interface AddSeniorModalProps {
   isOpen: boolean;
@@ -23,8 +23,8 @@ const AddSeniorModal: React.FC<AddSeniorModalProps> = ({ isOpen, onClose, onSave
   const ensureValidUUIDs = (data: any[]) => {
     return data.map(item => ({
       ...item,
-      id: /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(item.id) 
-        ? item.id 
+      id: /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(item.id)
+        ? item.id
         : uuidv4()
     }));
   };

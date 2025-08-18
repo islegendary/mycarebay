@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getCareAdvice, generateFacilityChecklist } from '../services/geminiService';
-import type { CareAdvice, GroundingSource, User, Senior, ChecklistResponse } from '../types';
+import { getCareAdvice, generateFacilityChecklist } from '@/services/geminiService';
+import type { CareAdvice, GroundingSource, User, Senior, ChecklistResponse } from '@/types';
 import Loader from './Loader';
 import MarkdownRenderer from './MarkdownRenderer';
 import Checklist from './Checklist';

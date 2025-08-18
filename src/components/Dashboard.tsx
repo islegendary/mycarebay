@@ -1,6 +1,6 @@
 import React from 'react';
-import { Senior, User } from '../types';
-import SeniorCard from './SeniorCard';
+import { Senior, User } from '@/types';
+import SeniorCard from '@/components/SeniorCard';
 
 interface DashboardProps {
   seniors: Senior[];

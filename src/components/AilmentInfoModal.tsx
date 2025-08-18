@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAilmentEducation } from '../services/geminiService';
+import { getAilmentEducation } from '@/services/geminiService';
 import Loader from './Loader';
 import MarkdownRenderer from './MarkdownRenderer';
 
@@ -39,7 +39,7 @@ const AilmentInfoModal: React.FC<AilmentInfoModalProps> = ({ ailmentName, onClos
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4" onClick={onClose}>
-      <div 
+      <div
         className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >

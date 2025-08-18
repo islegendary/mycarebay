@@ -1,4 +1,4 @@
-import { Senior } from '../types';
+import { Senior } from '@/types';
 
 const API_BASE_URL = process.env.NODE_ENV === 'production'
   ? '/api'

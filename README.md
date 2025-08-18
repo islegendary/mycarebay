@@ -50,11 +50,18 @@ Visit <http://localhost:5173> to see the app running.
 
 ```
 mycarebay/
-├── components/          # React UI components
-├── api/                # Vercel serverless functions
-├── server/             # Local Express development server
-├── services/           # API clients and AI integration
-├── types.ts            # TypeScript definitions
+├── src/
+│   ├── components/     # React UI components
+│   ├── services/       # API clients and AI integration
+│   ├── hooks/          # Custom React hooks
+│   ├── types/          # TypeScript definitions
+│   ├── constants/      # App constants and initial data
+│   ├── styles/         # Global styles and CSS
+│   ├── App.tsx         # Main application component
+│   └── main.tsx        # Vite entry point
+├── api/                # Vercel serverless functions (production)
+├── server/             # Local Express development server (dev only)
+├── public/             # Static assets
 └── supabase-migration.sql
 ```
 

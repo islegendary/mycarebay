@@ -36,7 +36,7 @@ async function getCareAdvice(
 ### Component Structure
 ```typescript
 import React, { useState } from 'react';
-import { Senior } from '../types';
+import { Senior } from '@/types';
 
 interface SeniorCardProps {
   senior: Senior;
@@ -113,9 +113,12 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 src/
 ├── components/     # UI components
 ├── services/       # API services  
-├── utils/         # Helper functions
-├── types.ts       # Type definitions
-└── constants.ts   # App constants
+├── hooks/          # Custom React hooks
+├── types/          # TypeScript definitions (index.ts)
+├── constants/      # App constants (index.ts)
+├── styles/         # Global styles and CSS
+├── App.tsx         # Main application component
+└── main.tsx        # Vite entry point
 ```
 
 ### Import Order
@@ -127,13 +130,13 @@ import React, { useState } from 'react';
 import { format } from 'date-fns';
 
 // Internal services
-import { getCareAdvice } from '../services/geminiService';
+import { getCareAdvice } from '@/services/geminiService';
 
 // Internal components
-import { SeniorCard } from './SeniorCard';
+import { SeniorCard } from '@/components/SeniorCard';
 
 // Types and utils
-import { Senior } from '../types';
+import { Senior } from '@/types';
 ```
 
 ## API Design

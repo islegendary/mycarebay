@@ -1,5 +1,5 @@
 import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
-import type { CareAdvice, GroundingSource, ChecklistResponse, Senior } from '../types';
+import type { CareAdvice, GroundingSource, ChecklistResponse, Senior } from '@/types';
 
 // Ensure the API key is available as an environment variable
 const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;

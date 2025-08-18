@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Senior, User } from './types';
-import { ApiService, handleApiError, createLoadingState } from './services/apiService';
-import Header from './components/Header';
-import Dashboard from './components/Dashboard';
-import SeniorProfile from './components/SeniorProfile';
-import LandingPage from './components/LandingPage';
-import CareAdvisor from './components/CareAdvisor';
-import AddSeniorModal from './components/AddSeniorModal';
+import { Senior, User } from '@/types';
+import { ApiService, handleApiError, createLoadingState } from '@/services/apiService';
+import Header from '@/components/Header';
+import Dashboard from '@/components/Dashboard';
+import SeniorProfile from '@/components/SeniorProfile';
+import LandingPage from '@/components/LandingPage';
+import CareAdvisor from '@/components/CareAdvisor';
+import AddSeniorModal from '@/components/AddSeniorModal';
 
 type ActiveView = 'dashboard' | 'advisor';
 

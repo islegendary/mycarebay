@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Senior, Ailment, Medication, Appointment, Contact } from '../types';
+import { Senior, Ailment, Medication, Appointment, Contact } from '@/types';
 import AilmentInfoModal from './AilmentInfoModal';
 import InfoCard from './InfoCard';
 import InitialsAvatar from './InitialsAvatar';

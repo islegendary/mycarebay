@@ -1,5 +1,5 @@
 import React, { useState, useId } from 'react';
-import { ChecklistResponse } from '../types';
+import { ChecklistResponse } from '@/types';
 
 interface ChecklistProps {
     data: ChecklistResponse;
