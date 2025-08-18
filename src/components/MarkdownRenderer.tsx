@@ -21,10 +21,20 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text }) => {
         
         // Unordered list items
         if (line.startsWith('* ')) {
-            return <li key={index} className="ml-5 list-disc mb-1">{boldedLine.slice(1)}</li>; // slice(1) to remove the '* ' part from span
+            const content = line.substring(2).trim();
+            if (!content) return null; // Skip empty list items
+            const boldedContent = content.split('**').map((part, i) =>
+                i % 2 === 1 ? <strong key={i} className="font-semibold text-brand-gray-dark">{part}</strong> : <span key={i}>{part}</span>
+            );
+            return <li key={index} className="ml-5 list-disc mb-1">{boldedContent}</li>;
         }
         if (line.startsWith('- ')) {
-            return <li key={index} className="ml-5 list-disc mb-1">{boldedLine.slice(1)}</li>; // slice(1) to remove the '- ' part from span
+            const content = line.substring(2).trim();
+            if (!content) return null; // Skip empty list items
+            const boldedContent = content.split('**').map((part, i) =>
+                i % 2 === 1 ? <strong key={i} className="font-semibold text-brand-gray-dark">{part}</strong> : <span key={i}>{part}</span>
+            );
+            return <li key={index} className="ml-5 list-disc mb-1">{boldedContent}</li>;
         }
 
         // Numbered list items
@@ -68,9 +78,15 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text }) => {
         }
 
         if (isUl || isOl) {
-            currentList.push(renderLine(line, index));
+            const listItem = renderLine(line, index);
+            if (listItem !== null) {
+                currentList.push(listItem);
+            }
         } else {
-            elements.push(renderLine(line, index));
+            const element = renderLine(line, index);
+            if (element !== null) {
+                elements.push(element);
+            }
         }
     });
 
