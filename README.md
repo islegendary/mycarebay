@@ -44,20 +44,21 @@ Visit <http://localhost:5173> to see the app running.
 **Backend**: Express.js (local) / Vercel Serverless (production)  
 **Database**: Supabase (PostgreSQL)  
 **AI**: Google Gemini API  
-**Deployment**: Vercel
+**Deployment**: Vercel  
+**Performance**: Code splitting, lazy loading, error boundaries
 
 ## 📁 Project Structure
 
 ```
 mycarebay/
 ├── src/
-│   ├── components/     # React UI components
-│   ├── services/       # API clients and AI integration
-│   ├── hooks/          # Custom React hooks
+│   ├── components/     # React UI components (with lazy loading)
+│   ├── services/       # API clients, AI integration, error handling
+│   ├── hooks/          # Custom React hooks (performance monitoring)
 │   ├── types/          # TypeScript definitions
 │   ├── constants/      # App constants and initial data
 │   ├── styles/         # Global styles and CSS
-│   ├── App.tsx         # Main application component
+│   ├── App.tsx         # Main application component (with error boundaries)
 │   └── main.tsx        # Vite entry point
 ├── api/                # Vercel serverless functions (production)
 ├── server/             # Local Express development server (dev only)
@@ -86,6 +87,12 @@ Generate customized inspection checklists for care facilities, tailored to speci
 ### Secure Profile Management
 Store and manage senior health information with proper authentication and data protection.
 
+### Performance & Reliability
+- **Error Boundaries**: Graceful error handling with user-friendly fallbacks
+- **Code Splitting**: Optimized loading with lazy-loaded components
+- **Performance Monitoring**: Real-time tracking of component load times
+- **Error Logging**: Comprehensive error tracking and monitoring
+
 ## 🚀 Deployment
 
 ### Local Development
@@ -102,7 +109,8 @@ Access at <http://localhost:5173> (frontend) and <http://localhost:3001> (API)
 **Required Environment Variables:**
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY` 
-- `GEMINI_API_KEY`
+- `VITE_GEMINI_API_KEY` (client-side)
+- `GEMINI_API_KEY` (server-side fallback)
 - `NODE_ENV=production`
 
 ## 🔒 Environment Setup
@@ -111,6 +119,7 @@ Create `.env.local`:
 ```env
 SUPABASE_URL=https://your-project-id.supabase.co
 SUPABASE_ANON_KEY=your-supabase-anon-key
+VITE_GEMINI_API_KEY=your-gemini-api-key
 GEMINI_API_KEY=your-gemini-api-key
 NODE_ENV=development
 ```
@@ -120,6 +129,8 @@ NODE_ENV=development
 **Health**: `GET /api/health`  
 **Authentication**: `POST /api/auth/login`  
 **Seniors**: `GET/POST/DELETE /api/seniors/*`  
+**Error Logging**: `POST /api/error-log`  
+**Performance Logging**: `POST /api/performance-log`  
 
 All endpoints work identically in local development and production.
 
@@ -135,6 +146,8 @@ All endpoints work identically in local development and production.
 - `STYLE_GUIDE.md` - Coding standards and conventions
 - `TESTING_CHECKLIST.md` - Manual and automated testing procedures  
 - `DEPLOYMENT_CHECKLIST.md` - Production deployment guide
+- `PERFORMANCE_AND_ERROR_HANDLING.md` - Error handling and performance optimizations
+- `TESTING_SUMMARY.md` - Implementation testing results
 
 ## 🤝 Contributing
 

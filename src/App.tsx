@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Senior, User } from '@/types';
 import { ApiService, handleApiError, createLoadingState } from '@/services/apiService';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import LazyComponent from '@/components/LazyComponent';
+import errorService from '@/services/errorService';
 import Header from '@/components/Header';
-import Dashboard from '@/components/Dashboard';
-import SeniorProfile from '@/components/SeniorProfile';
-import LandingPage from '@/components/LandingPage';
-import CareAdvisor from '@/components/CareAdvisor';
-import AddSeniorModal from '@/components/AddSeniorModal';
+import Loader from '@/components/Loader';
+import {
+  Dashboard,
+  SeniorProfile,
+  LandingPage,
+  CareAdvisor,
+  AddSeniorModal
+} from '@/components/lazy';
 
 type ActiveView = 'dashboard' | 'advisor';
 
@@ -75,6 +81,10 @@ function App() {
     setActiveView('dashboard');
     setSeniors([]);
     loadingState.reset();
+  };
+
+  const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
+    errorService.logReactError(error, errorInfo);
   };
 
   const handleSelectSenior = (id: string) => {
@@ -204,91 +214,103 @@ function App() {
   }
 
   if (!currentUser) {
-    return <LandingPage onAuthenticate={handleAuthentication} />;
+    return (
+      <LazyComponent>
+        <LandingPage onAuthenticate={handleAuthentication} />
+      </LazyComponent>
+    );
   }
 
   const selectedSenior = seniors.find(s => s.id === selectedSeniorId);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <Header
-        user={currentUser}
-        onLogout={handleLogout}
-        onNavigate={handleNavigate}
-        activeView={activeView}
-      />
+    <ErrorBoundary onError={handleError}>
+      <div className="min-h-screen bg-slate-50">
+        <Header
+          user={currentUser}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          activeView={activeView}
+        />
 
-      {loadingState.loading && (
-        <div className="fixed top-4 right-4 bg-white rounded-lg shadow-lg p-4 z-50">
-          <div className="flex items-center space-x-2">
-            <div className="loader"></div>
-            <span className="text-brand-gray-dark">Saving...</span>
-          </div>
-        </div>
-      )}
-
-      {loadingState.error && (
-        <div className="fixed top-4 right-4 bg-red-50 border border-red-200 rounded-lg shadow-lg p-4 z-50 max-w-sm">
-          <div className="flex items-start space-x-2">
-            <svg className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-            <div>
-              <p className="text-red-800 text-sm font-medium">Error</p>
-              <p className="text-red-700 text-sm">{loadingState.error}</p>
+        {loadingState.loading && (
+          <div className="fixed top-4 right-4 bg-white rounded-lg shadow-lg p-4 z-50">
+            <div className="flex items-center space-x-2">
+              <div className="loader"></div>
+              <span className="text-brand-gray-dark">Saving...</span>
             </div>
-            <button
-              onClick={() => loadingState.setError(null)}
-              className="text-red-400 hover:text-red-600"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
           </div>
-        </div>
-      )}
-
-      <main className="container mx-auto px-4 py-8">
-        {activeView === 'dashboard' && (
-          selectedSenior ? (
-            <SeniorProfile
-              senior={selectedSenior}
-              onBack={() => setSelectedSeniorId(null)}
-              onEdit={() => handleEditSenior(selectedSenior)}
-              onDelete={() => handleDeleteSenior(selectedSenior.id)}
-              onNavigateToAdvisor={() => handleNavigate('advisor')}
-            />
-          ) : (
-            <Dashboard
-              seniors={seniors}
-              onSelectSenior={handleSelectSenior}
-              onAddSenior={handleAddSenior}
-              onNavigateToAdvisor={() => handleNavigate('advisor')}
-            />
-          )
         )}
 
-        {activeView === 'advisor' && (
-          <CareAdvisor
-            selectedSenior={selectedSenior}
-            onBackToProfile={() => handleNavigate('dashboard')}
+        {loadingState.error && (
+          <div className="fixed top-4 right-4 bg-red-50 border border-red-200 rounded-lg shadow-lg p-4 z-50 max-w-sm">
+            <div className="flex items-start space-x-2">
+              <svg className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+              <div>
+                <p className="text-red-800 text-sm font-medium">Error</p>
+                <p className="text-red-700 text-sm">{loadingState.error}</p>
+              </div>
+              <button
+                onClick={() => loadingState.setError(null)}
+                className="text-red-400 hover:text-red-600"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+
+        <main className="container mx-auto px-4 py-8">
+          {activeView === 'dashboard' && (
+            selectedSenior ? (
+              <LazyComponent>
+                <SeniorProfile
+                  senior={selectedSenior}
+                  onBack={() => setSelectedSeniorId(null)}
+                  onEdit={() => handleEditSenior(selectedSenior)}
+                  onDelete={() => handleDeleteSenior(selectedSenior.id)}
+                  onNavigateToAdvisor={() => handleNavigate('advisor')}
+                />
+              </LazyComponent>
+            ) : (
+              <LazyComponent>
+                <Dashboard
+                  seniors={seniors}
+                  onSelectSenior={handleSelectSenior}
+                  onAddSenior={handleAddSenior}
+                  onNavigateToAdvisor={() => handleNavigate('advisor')}
+                />
+              </LazyComponent>
+            )
+          )}
+
+          {activeView === 'advisor' && (
+            <LazyComponent>
+              <CareAdvisor
+                selectedSenior={selectedSenior}
+                onBackToProfile={() => handleNavigate('dashboard')}
+              />
+            </LazyComponent>
+          )}
+        </main>
+
+        <LazyComponent>
+          <AddSeniorModal
+            isOpen={isAddSeniorModalOpen}
+            onClose={() => {
+              setIsAddSeniorModalOpen(false);
+              setEditingSenior(null);
+            }}
+            onSave={handleSaveSenior}
+            editingSenior={editingSenior}
           />
-        )}
-
-
-      </main>
-
-      <AddSeniorModal
-        isOpen={isAddSeniorModalOpen}
-        onClose={() => {
-          setIsAddSeniorModalOpen(false);
-          setEditingSenior(null);
-        }}
-        onSave={handleSaveSenior}
-        editingSenior={editingSenior}
-      />
-    </div>
+        </LazyComponent>
+      </div>
+    </ErrorBoundary>
   );
 }
 

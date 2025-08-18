@@ -1,4 +1,4 @@
-import { Senior } from './types';
+import { Senior } from '@/types';
 
 export const INITIAL_SENIORS: Senior[] = [
   {

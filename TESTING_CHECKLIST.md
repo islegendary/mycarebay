@@ -9,6 +9,7 @@ Comprehensive testing procedures to ensure reliability and functionality.
 # Test environment variables
 echo $SUPABASE_URL
 echo $SUPABASE_ANON_KEY  
+echo $VITE_GEMINI_API_KEY
 echo $GEMINI_API_KEY
 
 # Test database connection
@@ -185,6 +186,14 @@ Test each endpoint on production URL:
 - [ ] Largest Contentful Paint (LCP) < 2.5s
 - [ ] First Input Delay (FID) < 100ms
 - [ ] Cumulative Layout Shift (CLS) < 0.1
+
+### Error Handling & Performance Features
+- [ ] Error boundaries catch component errors gracefully
+- [ ] Lazy loading works (components load on demand)
+- [ ] Code splitting effective (check Network tab for chunks)
+- [ ] Performance monitoring logs component load times
+- [ ] Error logging captures and reports errors
+- [ ] Retry mechanisms work for failed operations
 
 ### Backend Performance
 ```bash

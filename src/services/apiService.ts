@@ -1,4 +1,5 @@
 import { Senior } from '@/types';
+import errorService from './errorService';
 
 const API_BASE_URL = process.env.NODE_ENV === 'production'
   ? '/api'
@@ -15,7 +16,7 @@ export interface LoginResponse {
   id: string;
   email: string;
   name: string;
-  plan: string;
+  plan: 'free' | 'plus' | 'pro';
 }
 
 export interface SaveSeniorResponse {
@@ -64,6 +65,7 @@ export class ApiService {
       return await response.json();
     } catch (error) {
       console.error('API request failed:', error);
+      errorService.logApiError(error, endpoint);
       throw error;
     }
   }

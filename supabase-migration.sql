@@ -62,12 +62,45 @@ CREATE TABLE IF NOT EXISTS contacts (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Error logs table for monitoring and debugging
+CREATE TABLE IF NOT EXISTS error_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  message TEXT NOT NULL,
+  stack TEXT,
+  component_stack TEXT,
+  timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
+  user_agent TEXT,
+  url TEXT,
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  error_type TEXT NOT NULL,
+  severity TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Performance logs table for monitoring component load times
+CREATE TABLE IF NOT EXISTS performance_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  component_name TEXT NOT NULL,
+  load_time NUMERIC NOT NULL,
+  timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
+  user_agent TEXT,
+  url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_seniors_user_id ON seniors(user_id);
 CREATE INDEX IF NOT EXISTS idx_ailments_senior_id ON ailments(senior_id);
 CREATE INDEX IF NOT EXISTS idx_medications_senior_id ON medications(senior_id);
 CREATE INDEX IF NOT EXISTS idx_appointments_senior_id ON appointments(senior_id);
 CREATE INDEX IF NOT EXISTS idx_contacts_senior_id ON contacts(senior_id);
+CREATE INDEX IF NOT EXISTS idx_error_logs_timestamp ON error_logs(timestamp);
+CREATE INDEX IF NOT EXISTS idx_error_logs_user_id ON error_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_error_logs_error_type ON error_logs(error_type);
+CREATE INDEX IF NOT EXISTS idx_error_logs_severity ON error_logs(severity);
+CREATE INDEX IF NOT EXISTS idx_performance_logs_timestamp ON performance_logs(timestamp);
+CREATE INDEX IF NOT EXISTS idx_performance_logs_component ON performance_logs(component_name);
+CREATE INDEX IF NOT EXISTS idx_performance_logs_load_time ON performance_logs(load_time);
 
 -- Clear existing demo data to ensure clean insertion
 DELETE FROM contacts WHERE senior_id = '550e8400-e29b-41d4-a716-446655440001';

@@ -21,6 +21,18 @@ export default defineConfig(({ mode }) => {
         '@styles': path.resolve(__dirname, 'src/styles'),
       }
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom'],
+            ui: ['react-tsparticles', 'tsparticles'],
+            utils: ['uuid']
+          }
+        }
+      },
+      chunkSizeWarningLimit: 1000
+    },
     server: {
       proxy: {
         '/api': 'http://localhost:3001'

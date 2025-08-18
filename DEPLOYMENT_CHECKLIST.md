@@ -37,7 +37,8 @@ npm list --depth=0
 Set in Vercel dashboard:
 - [ ] `SUPABASE_URL` (production Supabase project)
 - [ ] `SUPABASE_ANON_KEY` (production key)
-- [ ] `GEMINI_API_KEY` (Google AI key)
+- [ ] `VITE_GEMINI_API_KEY` (Google AI key for client-side)
+- [ ] `GEMINI_API_KEY` (Google AI key for server-side)
 - [ ] `NODE_ENV=production`
 
 ### Security Verification
@@ -84,6 +85,8 @@ curl https://your-domain.vercel.app/api/test
 - [ ] `/api/test` returns test message
 - [ ] `/api/auth/login` processes requests
 - [ ] `/api/seniors/*` endpoints function correctly
+- [ ] `/api/error-log` accepts error logging requests
+- [ ] `/api/performance-log` accepts performance metrics
 
 ## Post-Deployment Verification
 
@@ -98,6 +101,9 @@ curl https://your-domain.vercel.app/api/test
 ### Performance Check
 - [ ] Page load times acceptable (< 3s)
 - [ ] API response times reasonable (< 1s for CRUD)
+- [ ] Code splitting working (check Network tab for chunks)
+- [ ] Lazy loading functioning (components load on demand)
+- [ ] Error boundaries working (test with intentional errors)
 - [ ] AI features complete within timeout (< 10s)
 - [ ] Core Web Vitals meet thresholds
 

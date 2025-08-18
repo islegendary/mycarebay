@@ -18,7 +18,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text }) => {
         const boldedLine = line.split('**').map((part, i) =>
             i % 2 === 1 ? <strong key={i} className="font-semibold text-brand-gray-dark">{part}</strong> : <span key={i}>{part}</span>
         );
-        
+
         // Unordered list items
         if (line.startsWith('* ')) {
             const content = line.substring(2).trim();
@@ -46,11 +46,11 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text }) => {
             );
             return <li key={index} className="ml-5 mb-1">{boldedContent}</li>
         }
-        
+
         if (line.trim() === '') {
             return <br key={index} />;
         }
-        
+
         return <p key={index} className="mb-2 leading-relaxed">{boldedLine}</p>;
     };
 
@@ -68,7 +68,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text }) => {
             currentList = [];
             listType = 'ul';
         } else if (isOl && listType !== 'ol') {
-             if (currentList.length > 0) elements.push(listType === 'ul' ? <ul key={`list-${index}-prev`} className="list-disc space-y-1 my-3">{currentList}</ul> : <ol key={`list-${index}-prev`} className="list-decimal space-y-1 my-3">{currentList}</ol>);
+            if (currentList.length > 0) elements.push(listType === 'ul' ? <ul key={`list-${index}-prev`} className="list-disc space-y-1 my-3">{currentList}</ul> : <ol key={`list-${index}-prev`} className="list-decimal space-y-1 my-3">{currentList}</ol>);
             currentList = [];
             listType = 'ol';
         } else if (!isUl && !isOl && listType) {
@@ -93,7 +93,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text }) => {
     if (currentList.length > 0) {
         elements.push(listType === 'ol' ? <ol key="list-final" className="list-decimal space-y-1 my-3">{currentList}</ol> : <ul key="list-final" className="list-disc space-y-1 my-3">{currentList}</ul>);
     }
-    
+
     return <div className="prose prose-slate max-w-none">{elements}</div>;
 };
 
