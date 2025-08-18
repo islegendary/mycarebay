@@ -26,7 +26,6 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks: {
             vendor: ['react', 'react-dom'],
-            ui: ['react-tsparticles', 'tsparticles'],
             utils: ['uuid']
           }
         }

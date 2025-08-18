@@ -22,23 +22,24 @@
 
 ### Chunk Analysis
 ```
-dist/assets/vendor-BzXSge-u.js               29.26 kB │ gzip:   9.36 kB  # React/React-DOM
-dist/assets/ui-CAZkqnVS.js                    0.09 kB │ gzip:   0.10 kB  # Particle effects
-dist/assets/utils-CtRu48qb.js                 0.81 kB │ gzip:   0.43 kB  # Utility libraries
-dist/assets/ParticleBackground-8nbkkgj6.js    0.56 kB │ gzip:   0.33 kB  # Background component
-dist/assets/Dashboard-BNV9lzfa.js            11.99 kB │ gzip:   2.40 kB  # Dashboard
-dist/assets/CareAdvisor-H3CB0NrM.js          19.54 kB │ gzip:   4.01 kB  # Care Advisor
-dist/assets/AddSeniorModal-zj6WypNi.js       22.43 kB │ gzip:   3.07 kB  # Modal
-dist/assets/LandingPage-CAt3qaiz.js          32.30 kB │ gzip:   5.04 kB  # Landing Page
-dist/assets/MarkdownRenderer-BvSqOCxn.js    239.55 kB │ gzip:  41.45 kB  # Markdown (largest)
-dist/assets/index-CZFWYRYz.js               359.81 kB │ gzip: 106.11 kB  # Main bundle
+dist/assets/vendor-BzXSge-u.js              29.26 kB │ gzip:   9.36 kB  # React/React-DOM
+dist/assets/utils-CtRu48qb.js                0.81 kB │ gzip:   0.43 kB  # Utility libraries
+dist/assets/FloatingParticles-C6OCbDnZ.js    0.93 kB │ gzip:   0.58 kB  # Custom particle effects
+dist/assets/ParticleBurst-B5RTPufW.js        1.92 kB │ gzip:   1.06 kB  # Particle burst effects
+dist/assets/Dashboard-yz1MwEAM.js           11.96 kB │ gzip:   2.38 kB  # Dashboard
+dist/assets/CareAdvisor-BgIySMI8.js         19.51 kB │ gzip:   3.99 kB  # Care Advisor
+dist/assets/AddSeniorModal-DIrSmQdU.js      22.40 kB │ gzip:   3.05 kB  # Modal
+dist/assets/LandingPage-awJAia7u.js         32.27 kB │ gzip:   5.03 kB  # Landing Page
+dist/assets/MarkdownRenderer-Ca_uMGQO.js   239.55 kB │ gzip:  41.45 kB  # Markdown (largest)
+dist/assets/index-S2VObV59.js              359.38 kB │ gzip: 106.05 kB  # Main bundle
 ```
 
 ### Performance Benefits Achieved
 - ✅ **Vendor libraries separated** (React/React-DOM: 29.26 kB)
 - ✅ **Heavy components lazy-loaded** (MarkdownRenderer: 239.55 kB)
-- ✅ **UI effects isolated** (Particle effects: 0.09 kB)
+- ✅ **Custom particle effects optimized** (FloatingParticles: 0.93 kB, ParticleBurst: 1.92 kB)
 - ✅ **Utility libraries chunked** (Utils: 0.81 kB)
+- ✅ **Removed deprecated tsparticles dependencies** (reduced bundle size)
 
 ## ✅ **Development Server - PASSED**
 
