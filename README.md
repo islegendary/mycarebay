@@ -1,165 +1,172 @@
 # MyCareBay
 
-A comprehensive senior care management platform that empowers families with AI-powered care insights and personalized facility checklists to make informed decisions about their loved ones' care needs.
+A comprehensive care management platform for seniors, built with React 19, TypeScript, Vite, and Supabase.
 
-## What is MyCareBay?
+## 🚀 Tech Stack
 
-MyCareBay helps families navigate senior care by providing:
-- **AI Care Advisor**: Personalized care recommendations based on health profiles
-- **Smart Facility Checklists**: Custom inspection lists tailored to specific needs
-- **Senior Profile Management**: Secure storage and management of health information
-- **Care Planning Tools**: Evidence-based guidance for care decisions
+- **Frontend**: React 19 + TypeScript + Vite + Tailwind CSS
+- **Backend**: Express.js / Vercel Serverless Functions
+- **Database**: Supabase (PostgreSQL)
+- **AI Integration**: Google Gemini API
+- **Deployment**: Vercel
+- **Performance**: Code splitting, lazy loading, error boundaries
 
-## 🚀 Quick Start
+## 🎯 Key Features
 
-### Prerequisites
-- Node.js 18+
-- Supabase account
-- Google Gemini AI API key
+### Core Functionality
+- **Senior Management**: Add, edit, and manage senior profiles
+- **Health Tracking**: Monitor ailments, medications, and appointments
+- **Contact Management**: Store and organize emergency contacts
+- **AI-Powered Care Advice**: Get personalized care recommendations
+- **Responsive Design**: Works seamlessly on all devices
 
-### Installation
-
-```bash
-# Clone and install
-git clone https://github.com/yourusername/mycarebay.git
-cd mycarebay
-npm install
-
-# Set up environment
-cp env.example .env.local
-# Edit .env.local with your credentials
-
-# Initialize database
-npm run test:supabase
-
-# Start development
-npm run dev:full
-```
-
-Visit <http://localhost:5173> to see the app running.
-
-## 🏗️ Tech Stack
-
-**Frontend**: React 19 + TypeScript + Vite + Tailwind CSS  
-**Backend**: Express.js (local) / Vercel Serverless (production)  
-**Database**: Supabase (PostgreSQL)  
-**AI**: Google Gemini API  
-**Deployment**: Vercel  
-**Performance**: Code splitting, lazy loading, error boundaries
+### Performance & Reliability
+- **Error Boundaries**: Graceful error handling to prevent app crashes
+- **Code Splitting**: Optimized bundle loading for better performance
+- **Performance Monitoring**: Track component load times and user experience
+- **Error Logging**: Centralized error tracking and reporting
 
 ## 📁 Project Structure
 
 ```
-mycarebay/
-├── src/
-│   ├── components/     # React UI components (with lazy loading)
-│   ├── services/       # API clients, AI integration, error handling
-│   ├── hooks/          # Custom React hooks (performance monitoring)
-│   ├── types/          # TypeScript definitions
-│   ├── constants/      # App constants and initial data
-│   ├── styles/         # Global styles and CSS
-│   ├── App.tsx         # Main application component (with error boundaries)
-│   └── main.tsx        # Vite entry point
-├── api/                # Vercel serverless functions (production)
-├── server/             # Local Express development server (dev only)
-├── public/             # Static assets
-└── supabase-migration.sql
+src/
+├── components/          # React components with lazy loading
+├── services/           # API services and error handling
+├── hooks/              # Custom hooks including performance monitoring
+├── types/              # TypeScript type definitions
+├── constants/          # App constants and demo data
+├── styles/             # Global styles
+└── App.tsx            # Main app with error boundaries
 ```
 
-## 🔧 Development Commands
+## 🛠️ Setup & Installation
 
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Supabase account
+- Google Gemini API key (optional)
+
+### Installation
 ```bash
-npm run dev:full        # Start both frontend and backend
-npm run dev             # Frontend only (Vite dev server)
-npm run server          # Backend only (Express server)
-npm run build           # Build for production
-npm run test:supabase   # Test database connection
+# Clone the repository
+git clone <repository-url>
+cd mycarebay
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp env.example .env.local
 ```
 
-## 📊 Key Features
+### Environment Variables
 
-### AI-Powered Care Advice
-Get personalized care recommendations based on detailed senior profiles including health conditions, medications, and care needs.
+Create a `.env.local` file with the following variables:
 
-### Dynamic Facility Checklists
-Generate customized inspection checklists for care facilities, tailored to specific ailments and requirements.
-
-### Secure Profile Management
-Store and manage senior health information with proper authentication and data protection.
-
-### Performance & Reliability
-- **Error Boundaries**: Graceful error handling with user-friendly fallbacks
-- **Code Splitting**: Optimized loading with lazy-loaded components
-- **Performance Monitoring**: Real-time tracking of component load times
-- **Error Logging**: Comprehensive error tracking and monitoring
-
-## 🚀 Deployment
-
-### Local Development
-```bash
-npm run dev:full
-```
-Access at <http://localhost:5173> (frontend) and <http://localhost:3001> (API)
-
-### Production (Vercel)
-1. Connect repository to Vercel
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically on push to `main` branch
-
-**Required Environment Variables:**
-- `SUPABASE_URL`
-- `SUPABASE_ANON_KEY` 
-- `VITE_GEMINI_API_KEY` (client-side)
-- `GEMINI_API_KEY` (server-side fallback)
-- `NODE_ENV=production`
-
-## 🔒 Environment Setup
-
-Create `.env.local`:
 ```env
-SUPABASE_URL=https://your-project-id.supabase.co
-SUPABASE_ANON_KEY=your-supabase-anon-key
-VITE_GEMINI_API_KEY=your-gemini-api-key
-GEMINI_API_KEY=your-gemini-api-key
+# Supabase Configuration
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Google Gemini API (optional - for AI features)
+# Use VITE_ prefix for client-side access
+VITE_GEMINI_API_KEY=your_gemini_api_key_here
+# Fallback for server-side access
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Development Configuration
 NODE_ENV=development
 ```
 
-## 🧪 API Endpoints
+### Database Setup
 
-**Health**: `GET /api/health`  
-**Authentication**: `POST /api/auth/login`  
-**Seniors**: `GET/POST/DELETE /api/seniors/*`  
-**Error Logging**: `POST /api/error-log`  
-**Performance Logging**: `POST /api/performance-log`  
+The application uses Supabase with the following table structure:
 
-All endpoints work identically in local development and production.
+- **users**: User accounts and authentication
+- **seniors**: Senior profiles and relationships
+- **ailments**: Health conditions and notes
+- **medications**: Prescription and dosage information
+- **appointments**: Medical appointments and schedules
+- **contacts**: Emergency and medical contacts
+- **error_logs**: Application error tracking
+- **performance_logs**: Performance monitoring data
 
-## 🔍 Troubleshooting
+All tables use UUID primary keys and proper foreign key relationships.
 
-**Build Issues**: Ensure `@vitejs/plugin-react` is installed  
-**Database Issues**: Run `npm run test:supabase` to verify connection  
-**API 404s**: Check that Express server is running on port 3001  
-**UUID Errors**: Verify senior ID format in requests
+### Development
+
+```bash
+# Start development server
+npm run dev
+
+# Start backend server (in separate terminal)
+npm run server
+
+# Build for production
+npm run build
+
+# Type checking
+npm run type-check
+```
+
+## 🌐 API Endpoints
+
+### Core Endpoints
+- `POST /api/auth/login` - User authentication
+- `GET /api/seniors/user` - Get user's seniors
+- `POST /api/seniors` - Create/update senior
+- `DELETE /api/seniors/delete` - Delete senior
+
+### Monitoring Endpoints
+- `POST /api/error-log` - Log application errors
+- `POST /api/performance-log` - Log performance metrics
+
+### AI Endpoints
+- `POST /api/ai/care-advice` - Get AI care recommendations
+- `POST /api/ai/facility-checklist` - Generate facility checklists
 
 ## 📚 Documentation
 
-- `STYLE_GUIDE.md` - Coding standards and conventions
-- `TESTING_CHECKLIST.md` - Manual and automated testing procedures  
-- `DEPLOYMENT_CHECKLIST.md` - Production deployment guide
-- `PERFORMANCE_AND_ERROR_HANDLING.md` - Error handling and performance optimizations
-- `TESTING_SUMMARY.md` - Implementation testing results
+- [Performance & Error Handling](./PERFORMANCE_AND_ERROR_HANDLING.md) - Detailed guide on error boundaries and performance monitoring
+- [Testing Summary](./TESTING_SUMMARY.md) - Testing results and verification
+- [Deployment Checklist](./DEPLOYMENT_CHECKLIST.md) - Production deployment guide
+- [Testing Checklist](./TESTING_CHECKLIST.md) - Comprehensive testing procedures
+- [Style Guide](./STYLE_GUIDE.md) - Code style and conventions
+
+## 🚀 Deployment
+
+### Vercel Deployment
+1. Connect your repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
+
+### Environment Variables for Production
+Ensure all environment variables are set in your Vercel project settings:
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `VITE_GEMINI_API_KEY` (if using AI features)
+- `GEMINI_API_KEY` (server-side fallback)
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Follow the style guide and run tests
-4. Submit a pull request
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
 ## 📄 License
 
-MIT License - see `LICENSE` file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+For support and questions:
+- Check the documentation files
+- Review the testing checklists
+- Open an issue on GitHub
 
 ---
 
-**Need Help?** Check the troubleshooting section or open an issue in the repository.
+**MyCareBay** - Making senior care management simple and efficient. 💙
