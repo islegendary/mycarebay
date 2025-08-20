@@ -168,8 +168,7 @@ app.post('/api/seniors', async (req, res) => {
           id: seniorId,
           user_id: userId,
           name: senior.name,
-          relationship: senior.relationship,
-          avatar_url: ''
+          relationship: senior.relationship
         });
 
       if (insertError) {

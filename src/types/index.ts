@@ -32,7 +32,6 @@ export interface Senior {
   id: string;
   name: string;
   relationship: string;
-  avatarUrl: string;
   ailments: Ailment[];
   medications: Medication[];
   appointments: Appointment[];

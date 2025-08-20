@@ -71,7 +71,6 @@ const AddSeniorModal: React.FC<AddSeniorModalProps> = ({ isOpen, onClose, onSave
       id: editingSenior?.id || '', // Let backend generate UUID for new seniors
       name: formData.name,
       relationship: formData.relationship,
-      avatarUrl: '', // No longer needed since we use initials
       ailments: formData.ailments || [],
       medications: formData.medications || [],
       appointments: formData.appointments || [],

@@ -5,7 +5,6 @@ export const INITIAL_SENIORS: Senior[] = [
     id: 'senior-1',
     name: 'Eleanor Vance',
     relationship: 'Mother',
-    avatarUrl: 'https://picsum.photos/seed/mom/200',
     ailments: [
       { id: 'ail-1', name: 'Arthritis', notes: 'Affects hands and knees primarily.' },
       { id: 'ail-2', name: 'Hypertension', notes: 'Monitored daily.' },

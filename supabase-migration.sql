@@ -9,13 +9,12 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Seniors table
+-- Seniors table (removed avatar_url since we use initials)
 CREATE TABLE IF NOT EXISTS seniors (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   relationship TEXT NOT NULL,
-  avatar_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -119,14 +118,13 @@ VALUES (
   'pro'
 );
 
--- Insert demo senior (Eleanor Vance)
-INSERT INTO seniors (id, user_id, name, relationship, avatar_url)
+-- Insert demo senior (Eleanor Vance) - removed avatar_url
+INSERT INTO seniors (id, user_id, name, relationship)
 VALUES (
   '550e8400-e29b-41d4-a716-446655440001',
   '550e8400-e29b-41d4-a716-446655440000',
   'Eleanor Vance',
-  'Mother',
-  null
+  'Mother'
 );
 
 -- Insert demo ailments

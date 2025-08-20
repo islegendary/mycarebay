@@ -48,7 +48,6 @@ export default async function handler(req, res) {
         user_id: userId,
         name: senior.name,
         relationship: senior.relationship,
-        avatar_url: senior.avatar_url,
         updated_at: new Date().toISOString()
       })
       .select()
