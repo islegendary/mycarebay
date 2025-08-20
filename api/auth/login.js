@@ -66,6 +66,7 @@ export default async function handler(req, res) {
 
       // Create demo senior for new users
       if (email === 'demo@mycarebay.com') {
+        console.log('Creating demo data for user:', email);
         try {
           const seniorId = uuidv4();
           
@@ -94,10 +95,14 @@ export default async function handler(req, res) {
               { id: uuidv4(), senior_id: seniorId, name: 'Ibuprofen', dosage: '200mg', frequency: 'As needed for pain' }
             ]);
 
-            // Create demo appointments
+            // Create demo appointments with future dates
+            const today = new Date();
+            const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+            const nextTwoMonths = new Date(today.getFullYear(), today.getMonth() + 2, today.getDate());
+            
             await supabase.from('appointments').insert([
-              { id: uuidv4(), senior_id: seniorId, date: '2024-08-15', time: '10:00 AM', doctor: 'Dr. Chen', purpose: 'Cardiology Follow-up', location: 'City Heart Clinic' },
-              { id: uuidv4(), senior_id: seniorId, date: '2024-09-02', time: '02:30 PM', doctor: 'Dr. Patel', purpose: 'Endocrinology Check-up', location: 'General Hospital' }
+              { id: uuidv4(), senior_id: seniorId, date: nextMonth.toISOString().split('T')[0], time: '10:00 AM', doctor: 'Dr. Chen', purpose: 'Cardiology Follow-up', location: 'City Heart Clinic' },
+              { id: uuidv4(), senior_id: seniorId, date: nextTwoMonths.toISOString().split('T')[0], time: '02:30 PM', doctor: 'Dr. Patel', purpose: 'Endocrinology Check-up', location: 'General Hospital' }
             ]);
 
             // Create demo contacts
@@ -107,6 +112,8 @@ export default async function handler(req, res) {
               { id: uuidv4(), senior_id: seniorId, name: 'Main Street Pharmacy', type: 'Pharmacist', phone: '555-0103' },
               { id: uuidv4(), senior_id: seniorId, name: 'Sarah (Neighbor)', type: 'Emergency', phone: '555-0104' }
             ]);
+            
+            console.log('Demo data created successfully for senior:', seniorId);
           }
         } catch (demoError) {
           console.error('Demo data creation error:', demoError);

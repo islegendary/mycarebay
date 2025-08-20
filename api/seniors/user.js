@@ -41,6 +41,7 @@ export default async function handler(req, res) {
     }
 
     // Get seniors for the user
+    console.log('Fetching seniors for user ID:', userId);
     const { data: seniors, error: seniorsError } = await supabase
       .from('seniors')
       .select('*')
