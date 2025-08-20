@@ -207,15 +207,6 @@ CREATE POLICY "Users can insert performance logs" ON performance_logs
 CREATE POLICY "Admins can view performance logs" ON performance_logs
     FOR SELECT USING (auth.role() = 'service_role');
 
--- Insert demo data (optional - remove if you don't want demo data)
-INSERT INTO users (id, email, name, plan) VALUES 
-    ('demo-user-1', 'demo@mycarebay.com', 'Demo User', 'free')
-ON CONFLICT (email) DO NOTHING;
-
-INSERT INTO seniors (id, user_id, name, relationship) VALUES 
-    ('demo-senior-1', 'demo-user-1', 'John Smith', 'Father')
-ON CONFLICT (id) DO NOTHING;
-
 -- Grant necessary permissions
 GRANT USAGE ON SCHEMA public TO postgres, anon, authenticated, service_role;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO postgres, anon, authenticated, service_role;
