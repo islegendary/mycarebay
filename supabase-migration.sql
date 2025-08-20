@@ -248,3 +248,52 @@ FROM information_schema.tables t
 WHERE table_schema = 'public' 
     AND table_name IN ('users', 'seniors', 'ailments', 'medications', 'appointments', 'contacts', 'error_logs', 'performance_logs')
 ORDER BY table_name;
+
+-- Create demo user and Eleanor Vance profile for pristine setup
+INSERT INTO users (id, email, name, plan, created_at) 
+VALUES (
+    'demo-user-id-12345',
+    'demo@mycarebay.com',
+    'demo',
+    'pro',
+    NOW()
+) ON CONFLICT (email) DO NOTHING;
+
+-- Create Eleanor Vance senior profile
+INSERT INTO seniors (id, user_id, name, relationship, created_at, updated_at)
+VALUES (
+    'eleanor-vance-id-67890',
+    'demo-user-id-12345',
+    'Eleanor Vance',
+    'Mother',
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO NOTHING;
+
+-- Create Eleanor's ailments
+INSERT INTO ailments (id, senior_id, name, notes, created_at) VALUES
+    ('ailment-arthritis-001', 'eleanor-vance-id-67890', 'Arthritis', 'Affects hands and knees primarily.', NOW()),
+    ('ailment-hypertension-002', 'eleanor-vance-id-67890', 'Hypertension', 'Monitored daily.', NOW()),
+    ('ailment-diabetes-003', 'eleanor-vance-id-67890', 'Type 2 Diabetes', 'Managed with diet and medication.', NOW())
+ON CONFLICT (id) DO NOTHING;
+
+-- Create Eleanor's medications
+INSERT INTO medications (id, senior_id, name, dosage, frequency, created_at) VALUES
+    ('med-lisinopril-001', 'eleanor-vance-id-67890', 'Lisinopril', '10mg', 'Once daily', NOW()),
+    ('med-metformin-002', 'eleanor-vance-id-67890', 'Metformin', '500mg', 'Twice daily', NOW()),
+    ('med-ibuprofen-003', 'eleanor-vance-id-67890', 'Ibuprofen', '200mg', 'As needed for pain', NOW())
+ON CONFLICT (id) DO NOTHING;
+
+-- Create Eleanor's appointments (with future dates)
+INSERT INTO appointments (id, senior_id, date, time, doctor, purpose, location, created_at) VALUES
+    ('appt-chen-001', 'eleanor-vance-id-67890', (NOW() + INTERVAL '1 month')::date, '10:00 AM', 'Dr. Chen', 'Cardiology Follow-up', 'City Heart Clinic', NOW()),
+    ('appt-patel-002', 'eleanor-vance-id-67890', (NOW() + INTERVAL '2 months')::date, '02:30 PM', 'Dr. Patel', 'Endocrinology Check-up', 'General Hospital', NOW())
+ON CONFLICT (id) DO NOTHING;
+
+-- Create Eleanor's contacts
+INSERT INTO contacts (id, senior_id, name, type, phone, email, created_at) VALUES
+    ('contact-chen-001', 'eleanor-vance-id-67890', 'Dr. Chen (Cardiologist)', 'Doctor', '555-0101', NULL, NOW()),
+    ('contact-patel-002', 'eleanor-vance-id-67890', 'Dr. Patel (Endocrinologist)', 'Doctor', '555-0102', NULL, NOW()),
+    ('contact-pharmacy-003', 'eleanor-vance-id-67890', 'Main Street Pharmacy', 'Pharmacist', '555-0103', NULL, NOW()),
+    ('contact-sarah-004', 'eleanor-vance-id-67890', 'Sarah (Neighbor)', 'Emergency', '555-0104', NULL, NOW())
+ON CONFLICT (id) DO NOTHING;

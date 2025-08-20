@@ -63,63 +63,6 @@ export default async function handler(req, res) {
       }
 
       user = newUser;
-
-      // Create demo senior for new users
-      if (email === 'demo@mycarebay.com') {
-        console.log('Creating demo data for user:', email);
-        try {
-          const seniorId = uuidv4();
-          
-          // Create demo senior
-          const { error: seniorError } = await supabase
-            .from('seniors')
-            .insert([{
-              id: seniorId,
-              user_id: userId,
-              name: 'Eleanor Vance',
-              relationship: 'Mother'
-            }]);
-
-          if (!seniorError) {
-            // Create demo ailments
-            await supabase.from('ailments').insert([
-              { id: uuidv4(), senior_id: seniorId, name: 'Arthritis', notes: 'Affects hands and knees primarily.' },
-              { id: uuidv4(), senior_id: seniorId, name: 'Hypertension', notes: 'Monitored daily.' },
-              { id: uuidv4(), senior_id: seniorId, name: 'Type 2 Diabetes', notes: 'Managed with diet and medication.' }
-            ]);
-
-            // Create demo medications
-            await supabase.from('medications').insert([
-              { id: uuidv4(), senior_id: seniorId, name: 'Lisinopril', dosage: '10mg', frequency: 'Once daily' },
-              { id: uuidv4(), senior_id: seniorId, name: 'Metformin', dosage: '500mg', frequency: 'Twice daily' },
-              { id: uuidv4(), senior_id: seniorId, name: 'Ibuprofen', dosage: '200mg', frequency: 'As needed for pain' }
-            ]);
-
-            // Create demo appointments with future dates
-            const today = new Date();
-            const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
-            const nextTwoMonths = new Date(today.getFullYear(), today.getMonth() + 2, today.getDate());
-            
-            await supabase.from('appointments').insert([
-              { id: uuidv4(), senior_id: seniorId, date: nextMonth.toISOString().split('T')[0], time: '10:00 AM', doctor: 'Dr. Chen', purpose: 'Cardiology Follow-up', location: 'City Heart Clinic' },
-              { id: uuidv4(), senior_id: seniorId, date: nextTwoMonths.toISOString().split('T')[0], time: '02:30 PM', doctor: 'Dr. Patel', purpose: 'Endocrinology Check-up', location: 'General Hospital' }
-            ]);
-
-            // Create demo contacts
-            await supabase.from('contacts').insert([
-              { id: uuidv4(), senior_id: seniorId, name: 'Dr. Chen (Cardiologist)', type: 'Doctor', phone: '555-0101' },
-              { id: uuidv4(), senior_id: seniorId, name: 'Dr. Patel (Endocrinologist)', type: 'Doctor', phone: '555-0102' },
-              { id: uuidv4(), senior_id: seniorId, name: 'Main Street Pharmacy', type: 'Pharmacist', phone: '555-0103' },
-              { id: uuidv4(), senior_id: seniorId, name: 'Sarah (Neighbor)', type: 'Emergency', phone: '555-0104' }
-            ]);
-            
-            console.log('Demo data created successfully for senior:', seniorId);
-          }
-        } catch (demoError) {
-          console.error('Demo data creation error:', demoError);
-          // Don't fail the login if demo data creation fails
-        }
-      }
     }
 
     res.status(200).json({

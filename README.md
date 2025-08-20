@@ -39,7 +39,6 @@ src/
 ├── services/           # API services and error handling
 ├── hooks/              # Custom hooks including performance monitoring
 ├── types/              # TypeScript type definitions
-├── constants/          # App constants and demo data
 ├── styles/             # Global styles
 └── App.tsx            # Main app with error boundaries
 ```
@@ -85,6 +84,13 @@ NODE_ENV=development
 ```
 
 ### Database Setup
+
+1. **Run the migration**: Execute the `supabase-migration.sql` file in your Supabase SQL Editor to create all tables and demo data.
+
+2. **Demo Account**: The migration automatically creates a demo account:
+   - **Email**: `demo@mycarebay.com`
+   - **Password**: `Demo2024!`
+   - **Profile**: Eleanor Vance (Mother) with complete health data
 
 The application uses Supabase with the following table structure:
 
