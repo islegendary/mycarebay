@@ -65,3 +65,6 @@ jspm_packages/
 # Backup/duplicate directories
 mycarebay3/
 maycarebay3/
+
+# Documentation with sensitive info
+get-service-role-key.md
