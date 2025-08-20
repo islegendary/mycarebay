@@ -111,7 +111,121 @@ CREATE INDEX IF NOT EXISTS idx_performance_logs_timestamp ON performance_logs(ti
 CREATE INDEX IF NOT EXISTS idx_performance_logs_component ON performance_logs(component_name);
 CREATE INDEX IF NOT EXISTS idx_performance_logs_load_time ON performance_logs(load_time);
 
--- Step 5: Verify the update was successful
+-- Step 5: Enable Row Level Security (RLS) on all tables
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE seniors ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ailments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE medications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE error_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE performance_logs ENABLE ROW LEVEL SECURITY;
+
+-- Step 6: Create RLS policies for users table
+DROP POLICY IF EXISTS "Users can view their own profile" ON users;
+CREATE POLICY "Users can view their own profile" ON users
+  FOR SELECT USING (auth.uid()::text = id::text);
+
+DROP POLICY IF EXISTS "Users can update their own profile" ON users;
+CREATE POLICY "Users can update their own profile" ON users
+  FOR UPDATE USING (auth.uid()::text = id::text);
+
+DROP POLICY IF EXISTS "Users can insert their own profile" ON users;
+CREATE POLICY "Users can insert their own profile" ON users
+  FOR INSERT WITH CHECK (auth.uid()::text = id::text);
+
+-- Step 7: Create RLS policies for seniors table
+DROP POLICY IF EXISTS "Users can view their own seniors" ON seniors;
+CREATE POLICY "Users can view their own seniors" ON seniors
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM users 
+      WHERE users.id = seniors.user_id 
+      AND users.id::text = auth.uid()::text
+    )
+  );
+
+DROP POLICY IF EXISTS "Users can manage their own seniors" ON seniors;
+CREATE POLICY "Users can manage their own seniors" ON seniors
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM users 
+      WHERE users.id = seniors.user_id 
+      AND users.id::text = auth.uid()::text
+    )
+  );
+
+-- Step 8: Create RLS policies for related tables (ailments, medications, appointments, contacts)
+-- These policies ensure users can only access data related to their own seniors
+
+-- Ailments policies
+DROP POLICY IF EXISTS "Users can manage ailments for their seniors" ON ailments;
+CREATE POLICY "Users can manage ailments for their seniors" ON ailments
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM seniors 
+      JOIN users ON users.id = seniors.user_id
+      WHERE seniors.id = ailments.senior_id 
+      AND users.id::text = auth.uid()::text
+    )
+  );
+
+-- Medications policies
+DROP POLICY IF EXISTS "Users can manage medications for their seniors" ON medications;
+CREATE POLICY "Users can manage medications for their seniors" ON medications
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM seniors 
+      JOIN users ON users.id = seniors.user_id
+      WHERE seniors.id = medications.senior_id 
+      AND users.id::text = auth.uid()::text
+    )
+  );
+
+-- Appointments policies
+DROP POLICY IF EXISTS "Users can manage appointments for their seniors" ON appointments;
+CREATE POLICY "Users can manage appointments for their seniors" ON appointments
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM seniors 
+      JOIN users ON users.id = seniors.user_id
+      WHERE seniors.id = appointments.senior_id 
+      AND users.id::text = auth.uid()::text
+    )
+  );
+
+-- Contacts policies
+DROP POLICY IF EXISTS "Users can manage contacts for their seniors" ON contacts;
+CREATE POLICY "Users can manage contacts for their seniors" ON contacts
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM seniors 
+      JOIN users ON users.id = seniors.user_id
+      WHERE seniors.id = contacts.senior_id 
+      AND users.id::text = auth.uid()::text
+    )
+  );
+
+-- Step 9: Create RLS policies for logging tables (more permissive for monitoring)
+-- Error logs - allow insert for all authenticated users, read for admins
+DROP POLICY IF EXISTS "Users can insert error logs" ON error_logs;
+CREATE POLICY "Users can insert error logs" ON error_logs
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Admins can view error logs" ON error_logs;
+CREATE POLICY "Admins can view error logs" ON error_logs
+  FOR SELECT USING (auth.role() = 'service_role');
+
+-- Performance logs - allow insert for all authenticated users, read for admins
+DROP POLICY IF EXISTS "Users can insert performance logs" ON performance_logs;
+CREATE POLICY "Users can insert performance logs" ON performance_logs
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Admins can view performance logs" ON performance_logs;
+CREATE POLICY "Admins can view performance logs" ON performance_logs
+  FOR SELECT USING (auth.role() = 'service_role');
+
+-- Step 10: Verify the update was successful
 SELECT 
   'Database update completed successfully' as status,
   (SELECT COUNT(*) FROM users) as users_count,
@@ -120,3 +234,13 @@ SELECT
   (SELECT COUNT(*) FROM medications) as medications_count,
   (SELECT COUNT(*) FROM appointments) as appointments_count,
   (SELECT COUNT(*) FROM contacts) as contacts_count;
+
+-- Step 11: Verify RLS is enabled
+SELECT 
+  schemaname,
+  tablename,
+  rowsecurity
+FROM pg_tables 
+WHERE schemaname = 'public' 
+  AND tablename IN ('users', 'seniors', 'ailments', 'medications', 'appointments', 'contacts', 'error_logs', 'performance_logs')
+ORDER BY tablename;

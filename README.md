@@ -6,7 +6,7 @@ A comprehensive care management platform for seniors, built with React 19, TypeS
 
 - **Frontend**: React 19 + TypeScript + Vite + Tailwind CSS
 - **Backend**: Express.js / Vercel Serverless Functions
-- **Database**: Supabase (PostgreSQL)
+- **Database**: Supabase (PostgreSQL) with Row Level Security
 - **AI Integration**: Google Gemini API
 - **Deployment**: Vercel
 - **Performance**: Code splitting, lazy loading, error boundaries
@@ -25,6 +25,11 @@ A comprehensive care management platform for seniors, built with React 19, TypeS
 - **Code Splitting**: Optimized bundle loading for better performance
 - **Performance Monitoring**: Track component load times and user experience
 - **Error Logging**: Centralized error tracking and reporting
+
+### Security
+- **Row Level Security (RLS)**: Database-level access control ensuring users can only access their own data
+- **Authentication**: Secure user authentication and session management
+- **Data Isolation**: Complete data separation between users
 
 ## 📁 Project Structure
 
@@ -92,7 +97,7 @@ The application uses Supabase with the following table structure:
 - **error_logs**: Application error tracking
 - **performance_logs**: Performance monitoring data
 
-All tables use UUID primary keys and proper foreign key relationships.
+All tables use UUID primary keys, proper foreign key relationships, and **Row Level Security (RLS)** for data protection.
 
 ### Development
 
@@ -125,6 +130,19 @@ npm run type-check
 ### AI Endpoints
 - `POST /api/ai/care-advice` - Get AI care recommendations
 - `POST /api/ai/facility-checklist` - Generate facility checklists
+
+## 🔒 Security Features
+
+### Row Level Security (RLS)
+- **User Data Isolation**: Users can only access their own data
+- **Senior Management**: Users can only manage seniors they own
+- **Health Data Protection**: All health-related data is user-scoped
+- **Logging Security**: Error and performance logs are properly secured
+
+### Authentication & Authorization
+- **Secure Authentication**: Proper user authentication flow
+- **Session Management**: Secure session handling
+- **API Protection**: All API endpoints are properly secured
 
 ## 📚 Documentation
 
