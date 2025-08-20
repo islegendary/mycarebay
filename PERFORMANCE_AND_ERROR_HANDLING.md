@@ -45,7 +45,7 @@
 
 ### 2. Lazy Loading
 - **File**: `src/components/lazy.tsx`
-- **Components**: Dashboard, SeniorProfile, CareAdvisor, LandingPage, AddSeniorModal, ParticleBackground
+- **Components**: Dashboard, SeniorProfile, CareAdvisor, LandingPage, AddSeniorModal, AilmentInfoModal, FloatingParticles, ParticleBurst
 - **Benefits**: Reduced initial bundle size, faster page loads
 
 ### 3. Lazy Component Wrapper
