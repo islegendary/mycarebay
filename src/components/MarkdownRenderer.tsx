@@ -6,7 +6,7 @@ interface MarkdownRendererProps {
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text }) => {
     const renderLine = (line: string, index: number) => {
-        // Headings
+        // Headings 
         if (line.startsWith('### ')) {
             return <h3 key={index} className="text-xl font-bold text-brand-gray-dark mt-4 mb-2">{line.substring(4)}</h3>;
         }
