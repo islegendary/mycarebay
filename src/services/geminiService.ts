@@ -17,7 +17,7 @@ if (apiKey) {
  */
 export const getAilmentEducation = async (ailmentName: string): Promise<string> => {
     if (!ai) {
-        return "AI features are not available. Please check your configuration.";
+        return "AI features are currently disabled but fully functional and available during live demos with Donnie. Contact us to schedule a personalized demo and see the AI-powered care advisor in action!";
     }
 
     try {
@@ -60,7 +60,7 @@ export const getAilmentEducation = async (ailmentName: string): Promise<string> 
 export const getCareAdvice = async (question: string): Promise<CareAdvice> => {
     if (!ai) {
         return {
-            text: "AI features are not available. Please check your configuration.",
+            text: "AI features are currently disabled but fully functional and available during live demos with Donnie. Contact us to schedule a personalized demo and see the AI-powered care advisor in action!",
             sources: []
         };
     }
@@ -97,8 +97,8 @@ export const generateFacilityChecklist = async (topic: string, selectedSenior?: 
     if (!ai) {
         return {
             checklist: [{
-                category: "AI Not Available",
-                questions: ["AI features are not available. Please check your configuration."]
+                category: "AI Demo Available",
+                questions: ["AI features are currently disabled but fully functional and available during live demos with Donnie. Contact us to schedule a personalized demo and see the AI-powered facility checklist generator in action!"]
             }]
         };
     }
